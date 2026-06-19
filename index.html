@@ -45,6 +45,7 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 .bar-fill{height:100%;border-radius:3px;transition:width .3s ease;}
 .bar-fill.len{background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 7px var(--green);}
 .bar-fill.pwr{background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 7px var(--blue);}
+.bar-fill.boost{background:linear-gradient(90deg,var(--orange),#ffcc00);box-shadow:0 0 7px var(--orange);}
 
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;
   letter-spacing:2px;font-weight:700;border:1px solid;margin-bottom:10px;}
@@ -59,8 +60,11 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 .sbar.spd{color:var(--purple);border-color:rgba(191,95,255,.4);background:rgba(191,95,255,.1);}
 .sbar.pwr{color:var(--blue);border-color:rgba(0,191,255,.5);background:rgba(0,191,255,.1);
   animation:pwrPulse 1s ease-in-out infinite;}
+.sbar.boost-bar{color:var(--orange);border-color:rgba(255,107,53,.5);background:rgba(255,107,53,.1);
+  animation:boostPulse 0.5s ease-in-out infinite;}
 .sbar.hidden{display:none;}
 @keyframes pwrPulse{0%,100%{box-shadow:0 0 5px rgba(0,191,255,.3);}50%{box-shadow:0 0 18px rgba(0,191,255,.8);}}
+@keyframes boostPulse{0%,100%{box-shadow:0 0 5px rgba(255,107,53,.3);}50%{box-shadow:0 0 14px rgba(255,107,53,.8);}}
 
 /* ── Food guide ── */
 .rp{background:rgba(13,13,43,.9);border:1px solid rgba(0,191,255,.2);border-radius:12px;
@@ -87,9 +91,11 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 /* ── Canvas ── */
 .cbox{position:relative;display:flex;flex-direction:column;align-items:center;}
 #gc{border:2px solid rgba(57,255,20,.35);border-radius:8px;display:block;
-  box-shadow:0 0 28px rgba(57,255,20,.18),0 0 60px rgba(57,255,20,.08);cursor:pointer;}
+  box-shadow:0 0 28px rgba(57,255,20,.18),0 0 60px rgba(57,255,20,.08);}
 #gc.pm{border-color:rgba(0,191,255,.75);
   box-shadow:0 0 30px rgba(0,191,255,.35),0 0 70px rgba(0,191,255,.15);}
+#gc.boost{border-color:rgba(255,107,53,.7);
+  box-shadow:0 0 25px rgba(255,107,53,.3),0 0 55px rgba(255,107,53,.12);}
 
 /* ── Overlays ── */
 .ov{position:absolute;top:0;left:0;width:100%;height:100%;
@@ -117,7 +123,6 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
   padding:7px 18px;margin-top:8px;box-shadow:0 0 9px rgba(0,255,255,.18);}
 .btn.s:hover{background:rgba(0,255,255,.09);box-shadow:0 0 22px rgba(0,255,255,.45);}
 
-/* How to play overlay scroll */
 .htp-body{max-width:420px;width:100%;overflow-y:auto;max-height:400px;padding-right:4px;}
 .htp-body::-webkit-scrollbar{width:4px;}
 .htp-body::-webkit-scrollbar-track{background:rgba(255,255,255,.05);}
@@ -133,12 +138,12 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 #toast.dmd{border-color:var(--blue);color:var(--blue);box-shadow:0 0 28px rgba(0,191,255,.55);}
 #toast.combo{border-color:var(--orange);color:var(--orange);box-shadow:0 0 28px rgba(255,107,53,.55);}
+#toast.boost{border-color:var(--orange);color:var(--orange);box-shadow:0 0 22px rgba(255,107,53,.5);}
 
 /* ── Bonus popup ── */
 .bpop{position:absolute;font-size:1.1rem;font-weight:700;pointer-events:none;
   z-index:20;animation:floatUp 1.4s ease forwards;text-shadow:0 0 9px currentColor;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-55px) scale(1.4);}}
-
 </style>
 </head>
 <body>
@@ -148,7 +153,7 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 <div class="wrap">
   <header>
     <h1>⚡ NEON SNAKE</h1>
-    <p>CYBERPUNK EDITION · AI ENHANCED · v2.0</p>
+    <p>CYBERPUNK EDITION · AI ENHANCED · v2.1</p>
   </header>
 
   <div class="row">
@@ -177,9 +182,13 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
         ⚡ DIAMOND POWER ⚡
         <div class="bar-wrap" style="margin-top:5px"><div class="bar-fill pwr" id="pwrFill" style="width:100%"></div></div>
       </div>
+      <div class="sbar boost-bar hidden" id="boostBar">
+        🍎 SPEED BOOST!
+        <div class="bar-wrap" style="margin-top:5px"><div class="bar-fill boost" id="boostFill" style="width:100%"></div></div>
+      </div>
       <div class="stat" style="margin-top:6px">
         <span class="stat-lbl">Combo</span>
-        <span class="stat-val" id="comboEl" style="font-size:1rem;color:var(--orange);text-shadow:0 0 12px var(--orange)">×0</span>
+        <span class="stat-val" id="comboEl" style="font-size:1rem;color:var(--dim)">—</span>
       </div>
     </div>
 
@@ -195,12 +204,12 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
           <div></div><div class="key">▲ W</div><div></div>
           <div class="key">◄ A</div><div class="key">▼ S</div><div class="key">► D</div>
         </div>
-        <p style="font-size:.72rem">or Arrow Keys &nbsp;·&nbsp; P = Pause</p>
+        <p style="font-size:.72rem">Arrow Keys · WASD &nbsp;·&nbsp; P = Pause &nbsp;·&nbsp; R = Restart</p>
         <p style="margin-top:11px;font-size:.7rem;line-height:1.7">
           💎 <span style="color:var(--blue)">Diamond</span> = FULL POWER MODE · +50 pts<br>
-          🍎 <span style="color:var(--orange)">Fruit</span> = High score + speed · +15 pts<br>
+          🍎 <span style="color:var(--orange)">Fruit</span> = Speed boost 3s · +15 pts<br>
           🥦 <span style="color:var(--cyan)">Veggie</span> = Steady growth · +5 pts<br>
-          🔥 Eat 3 in quick succession = COMBO ×2
+          🔥 Eat 3 in 4 seconds = COMBO ×2
         </p>
         <button class="btn" id="btnStart">START GAME</button>
         <button class="btn s" id="btnHow">HOW TO PLAY</button>
@@ -214,21 +223,23 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
         <div id="newHigh" style="display:none;color:var(--cyan);font-size:.85rem;letter-spacing:2px;margin-bottom:8px">★ NEW HIGH SCORE! ★</div>
         <p id="deathEl" style="font-size:.7rem;color:var(--dim)"></p>
         <button class="btn" id="btnRestart">PLAY AGAIN</button>
+        <p style="font-size:.6rem;color:var(--dim);margin-top:8px">Press R or Space to restart</p>
       </div>
 
       <!-- How to play -->
       <div class="ov hidden" id="ovHTP" style="text-align:left">
         <h2 style="color:var(--cyan);font-size:1.3rem;text-align:center;margin-bottom:14px">HOW TO PLAY</h2>
         <div class="htp-body">
-          <div class="tip"><span class="tip-i">🎮</span><span class="tip-t"><strong>Movement:</strong> WASD or Arrow Keys. You cannot reverse direction. P to pause.</span></div>
-          <div class="tip"><span class="tip-i">🥦</span><span class="tip-t"><strong>Vegetables:</strong> +5 pts, grow 1 segment. Cyan glow. Most common. Safe, reliable choice.</span></div>
-          <div class="tip"><span class="tip-i">🍎</span><span class="tip-t"><strong>Fruits:</strong> +15 pts, grow 2 segments, temporarily boost speed. Orange glow. Uncommon.</span></div>
+          <div class="tip"><span class="tip-i">🎮</span><span class="tip-t"><strong>Movement:</strong> WASD or Arrow Keys. Cannot reverse direction. P = Pause, R = Restart.</span></div>
+          <div class="tip"><span class="tip-i">🥦</span><span class="tip-t"><strong>Vegetables:</strong> +5 pts, grow 1 segment. Cyan glow. Most common. Safe and reliable.</span></div>
+          <div class="tip"><span class="tip-i">🍎</span><span class="tip-t"><strong>Fruits:</strong> +15 pts, grow 2 segments. Grants a 3-second speed boost. Orange glow. Uncommon.</span></div>
           <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Diamonds:</strong> +50 pts, grow 3 segments. Activates POWER MODE — snake turns electric blue with sparkles for 10 seconds. Rare!</span></div>
-          <div class="tip"><span class="tip-i">⚡</span><span class="tip-t"><strong>Power Mode:</strong> Snake becomes electric blue. Speed increases. Eat another diamond during power mode to extend + stack duration.</span></div>
-          <div class="tip"><span class="tip-i">🔥</span><span class="tip-t"><strong>Combo:</strong> Eat 3+ items within 3 seconds of each other to trigger COMBO ×2 — all points doubled!</span></div>
+          <div class="tip"><span class="tip-i">⚡</span><span class="tip-t"><strong>Power Mode:</strong> Snake becomes electric blue, speed increases. Eat another diamond during power mode to stack and extend duration.</span></div>
+          <div class="tip"><span class="tip-i">🔥</span><span class="tip-t"><strong>Combo:</strong> Eat 3+ items within 4 seconds to trigger COMBO ×2 — doubles your points!</span></div>
           <div class="tip"><span class="tip-i">🏆</span><span class="tip-t"><strong>Levels:</strong> Speed increases every 50 pts. 5 levels — Rookie → Hunter → Warrior → Master → Legend.</span></div>
           <div class="tip"><span class="tip-i">🔄</span><span class="tip-t"><strong>Food Moves:</strong> Food repositions after being eaten. Always 3 items on the board.</span></div>
           <div class="tip"><span class="tip-i">💡</span><span class="tip-t"><strong>Pro Tip:</strong> Move in U-shapes or spirals to avoid trapping yourself. Plan escape before chasing diamonds!</span></div>
+          <div class="tip"><span class="tip-i">⌨️</span><span class="tip-t"><strong>Keys:</strong> WASD / Arrows = move · P = pause · R or Space = restart anytime.</span></div>
         </div>
         <button class="btn s" id="btnHTPBack" style="margin-top:16px;align-self:center">← BACK</button>
       </div>
@@ -237,6 +248,7 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
       <div class="ov hidden" id="ovPause">
         <h2 style="color:var(--purple)">PAUSED</h2>
         <p style="margin-top:10px">Press <span style="color:var(--green)">P</span> to resume</p>
+        <p style="font-size:.65rem;margin-top:6px">R = restart</p>
       </div>
     </div>
 
@@ -249,7 +261,7 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
       </div>
       <div class="fi" id="fiFruit">
         <span class="fi-emoji">🍎</span>
-        <div><div class="fi-name f">FRUIT</div><div class="fi-desc">+15 pts · grow +2<br>Speed up · uncommon</div></div>
+        <div><div class="fi-name f">FRUIT</div><div class="fi-desc">+15 pts · grow +2<br>🍊 Speed boost 3s · uncommon</div></div>
       </div>
       <div class="fi" id="fiDmd">
         <span class="fi-emoji">💎</span>
@@ -257,21 +269,24 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
       </div>
 
       <h3 style="margin-top:14px">Pro Tips</h3>
-      <div class="tip"><span class="tip-i">🔄</span><span class="tip-t">Use <strong>U-shapes</strong> and <strong>spirals</strong> — avoid cutting yourself off early.</span></div>
+      <div class="tip"><span class="tip-i">🔄</span><span class="tip-t">Use <strong>U-shapes</strong> and <strong>spirals</strong> — avoid cutting yourself off.</span></div>
       <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Always</strong> plan an exit before chasing a diamond.</span></div>
-      <div class="tip"><span class="tip-i">🔥</span><span class="tip-t">Chain 3 items fast for a <strong>×2 COMBO</strong> bonus!</span></div>
-      <div class="tip"><span class="tip-i">⚡</span><span class="tip-t">During power mode, eat <strong>another diamond</strong> to extend and stack duration.</span></div>
+      <div class="tip"><span class="tip-i">🔥</span><span class="tip-t">Chain 3 items within <strong>4 seconds</strong> for a <strong>×2 COMBO</strong>!</span></div>
+      <div class="tip"><span class="tip-i">⚡</span><span class="tip-t">During power mode, eat <strong>another diamond</strong> to extend duration.</span></div>
       <div class="tip"><span class="tip-i">🏃</span><span class="tip-t">At HYPER/INSANE speed, <strong>look ahead</strong> — anticipate, don't react.</span></div>
-      <div class="tip"><span class="tip-i">🎯</span><span class="tip-t">Go for fruits when safe — <strong>3× the points</strong> of veggies!</span></div>
+      <div class="tip"><span class="tip-i">🍎</span><span class="tip-t">Grab a fruit before a tight turn — the speed boost helps break free.</span></div>
     </div>
   </div>
 </div>
 
 <script>
 // ═══════════════════════════════════════════════════
-//  NEON SNAKE — CYBERPUNK EDITION
+//  NEON SNAKE — CYBERPUNK EDITION v2.1
+//  Bug fixes: direction queue, power cleanup,
+//  fruit speed boost, particle cap, R/Space keys
 // ═══════════════════════════════════════════════════
 const GRID = 20, CELL = 30, W = 600;
+const MAX_PARTS = 250;
 
 const FOOD = {
   VEG: {
@@ -282,7 +297,7 @@ const FOOD = {
   FRUIT: {
     emojis:['🍎','🍊','🍇','🍓','🍑','🍋','🍒','🍈'],
     color:'#ff6b35', glow:'rgba(255,107,53,.55)',
-    score:15, growth:2, rarity:.3, id:'fruit'
+    score:15, growth:2, rarity:.3, boostDur:3000, id:'fruit'
   },
   DIAMOND: {
     emojis:['💎'],
@@ -312,6 +327,8 @@ const lvlBadge = document.getElementById('lvlBadge');
 const spdBar   = document.getElementById('spdBar');
 const pwrBar   = document.getElementById('pwrBar');
 const pwrFill  = document.getElementById('pwrFill');
+const boostBar = document.getElementById('boostBar');
+const boostFill= document.getElementById('boostFill');
 const comboEl  = document.getElementById('comboEl');
 const ovStart  = document.getElementById('ovStart');
 const ovGO     = document.getElementById('ovGO');
@@ -342,6 +359,7 @@ const SFX={
   over(){ [220,185,155,110].forEach((f,i)=>tone(f,'sawtooth',.32,.38,i*.12)); },
   lvlup(){ [392,523,659,784,1047].forEach((f,i)=>tone(f,'square',.15,.18,i*.08)); },
   combo(){ [523,659,784,1047,1318].forEach((f,i)=>tone(f,'triangle',.18,.22,i*.05)); },
+  boost(){ [440,554,659].forEach((f,i)=>tone(f,'triangle',.12,.2,i*.06)); },
 };
 
 // ── Background ──
@@ -359,30 +377,23 @@ initBg();
 
 function drawBg(ts){
   bgX.clearRect(0,0,bgW,bgH);
-  // Gradient background
   const gr=bgX.createRadialGradient(bgW/2,bgH/2,0,bgW/2,bgH/2,bgW*.72);
   gr.addColorStop(0,'#0e0e30'); gr.addColorStop(1,'#0a0a1a');
   bgX.fillStyle=gr; bgX.fillRect(0,0,bgW,bgH);
-  // Nebula
   bgX.save(); bgX.globalAlpha=.045+.02*Math.sin(ts/5000);
   const ng=bgX.createRadialGradient(bgW*.28,bgH*.38,0,bgW*.28,bgH*.38,bgW*.38);
   ng.addColorStop(0,'#4400cc'); ng.addColorStop(1,'transparent');
-  bgX.fillStyle=ng; bgX.fillRect(0,0,bgW,bgH);
-  bgX.restore();
-  // Second nebula
+  bgX.fillStyle=ng; bgX.fillRect(0,0,bgW,bgH); bgX.restore();
   bgX.save(); bgX.globalAlpha=.03+.015*Math.sin(ts/7000+1.5);
   const ng2=bgX.createRadialGradient(bgW*.72,bgH*.6,0,bgW*.72,bgH*.6,bgW*.3);
   ng2.addColorStop(0,'#003388'); ng2.addColorStop(1,'transparent');
-  bgX.fillStyle=ng2; bgX.fillRect(0,0,bgW,bgH);
-  bgX.restore();
-  // Stars
+  bgX.fillStyle=ng2; bgX.fillRect(0,0,bgW,bgH); bgX.restore();
   stars.forEach(s=>{
     s.tw+=.018;
     const a=s.op*(.65+.35*Math.sin(s.tw));
     bgX.beginPath(); bgX.arc(s.x,s.y,s.r,0,Math.PI*2);
     bgX.fillStyle=`rgba(200,215,255,${a})`; bgX.fill();
   });
-  // Scan lines
   bgX.save(); bgX.globalAlpha=.012;
   for(let x=0;x<bgW;x+=3){ bgX.fillStyle='#fff'; bgX.fillRect(x,0,1,bgH); }
   bgX.restore();
@@ -400,6 +411,8 @@ function spawnParts(px,py,color,n=12,big=false){
       r:big?3+Math.random()*3:2+Math.random()*2,
       color,big});
   }
+  // FIX: cap particle count to avoid frame rate drops
+  if(parts.length>MAX_PARTS) parts.splice(0,parts.length-MAX_PARTS);
 }
 function tickParts(){
   parts=parts.filter(p=>p.life>0);
@@ -411,9 +424,7 @@ function drawParts(){
     ctx.shadowColor=p.color; ctx.shadowBlur=p.big?10:6;
     ctx.fillStyle=p.color;
     if(p.big){
-      ctx.beginPath();
-      star5(ctx,p.x,p.y,p.r,p.r*.45);
-      ctx.fill();
+      ctx.beginPath(); star5(ctx,p.x,p.y,p.r,p.r*.45); ctx.fill();
     } else {
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2); ctx.fill();
     }
@@ -431,9 +442,9 @@ function star5(c,cx,cy,ro,ri){
 }
 
 // ── Game State ──
-let snake,dir,ndir,foods,score,high,running,paused;
-let powerMode,powerEnd,currentMs;
-let combo,lastEat,animF,lastTick;
+let snake, dir, dirQueue, foods, score, high, running, paused;
+let powerMode, powerEnd, fruitBoostEnd, currentMs;
+let combo, lastEat, animF, lastTick;
 
 high = +localStorage.getItem('neonSnakeHi')||0;
 highEl.textContent = high;
@@ -456,19 +467,29 @@ function spawnFood(){
 
 function initGame(){
   snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
-  dir={x:1,y:0}; ndir={x:1,y:0};
+  dir={x:1,y:0};
+  dirQueue=[];                         // FIX: use direction queue
   foods=[]; score=0;
   powerMode=false; powerEnd=0;
+  fruitBoostEnd=0;
   combo=0; lastEat=0; parts=[];
   currentMs=LEVELS[0].ms;
+  // FIX: always clean up all power/boost visuals on restart
   gc.className='';
+  pwrBar.classList.add('hidden');
+  boostBar.classList.add('hidden');
+  comboEl.textContent='—';
+  comboEl.style.color='var(--dim)';
   spawnFood(); spawnFood(); spawnFood();
   updateUI();
 }
 
 function recalcMs(){
   const lv=getLevel(score);
-  currentMs=powerMode?Math.max(48,lv.ms-22):lv.ms;
+  let ms=lv.ms;
+  if(powerMode) ms=Math.max(48,ms-22);          // diamond power: faster
+  if(Date.now()<fruitBoostEnd) ms=Math.max(48,ms-28); // fruit boost: faster
+  currentMs=ms;
 }
 
 function spdLabel(ms){
@@ -482,7 +503,10 @@ function spdLabel(ms){
 // ── Tick ──
 function tick(){
   if(!running||paused) return;
-  dir={...ndir};
+
+  // FIX: consume one direction from the queue per tick
+  if(dirQueue.length>0) dir=dirQueue.shift();
+
   const h={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
 
   if(h.x<0||h.x>=GRID||h.y<0||h.y>=GRID){ endGame('Hit the wall!'); return; }
@@ -495,7 +519,6 @@ function tick(){
     const fd=foods[fi];
     foods.splice(fi,1);
 
-    // Combo
     const now=Date.now();
     if(now-lastEat<4000) combo++; else combo=1;
     lastEat=now;
@@ -504,16 +527,13 @@ function tick(){
     let pts=fd.type.score;
     if(isCombo){ pts*=2; SFX.combo(); showToast('🔥 COMBO ×2!','combo'); }
 
-    // Grow
     for(let i=1;i<fd.type.growth;i++) snake.push({...snake[snake.length-1]});
 
-    // Level up?
     const prev=getLevel(score);
     score+=pts;
     const next=getLevel(score);
     if(next.min>prev.min){ SFX.lvlup(); showToast(`⚡ ${next.lbl}!`,'green'); }
 
-    // Effects
     if(fd.type===FOOD.VEG){
       SFX.veg();
       spawnParts(h.x*CELL,h.y*CELL,'#00ffff',10);
@@ -522,6 +542,15 @@ function tick(){
       SFX.fruit();
       spawnParts(h.x*CELL,h.y*CELL,'#ff6b35',14);
       flashFI('fiFruit');
+      // FIX: implement fruit speed boost
+      fruitBoostEnd=Date.now()+FOOD.FRUIT.boostDur;
+      if(!powerMode){
+        gc.classList.remove('pm');
+        gc.classList.add('boost');
+      }
+      boostBar.classList.remove('hidden');
+      SFX.boost();
+      if(!isCombo) showToast('🍎 SPEED BOOST!','boost');
     } else {
       SFX.diamond();
       spawnParts(h.x*CELL,h.y*CELL,'#00bfff',20,true);
@@ -544,21 +573,40 @@ function activatePower(){
   const rem=powerMode?Math.max(0,powerEnd-Date.now()):0;
   powerMode=true;
   powerEnd=Date.now()+FOOD.DIAMOND.powerDur+rem;
+  gc.classList.remove('boost');
   gc.classList.add('pm');
   pwrBar.classList.remove('hidden');
   showToast('💎 DIAMOND POWER MODE!','dmd');
   recalcMs();
 }
 
-function tickPower(){
-  if(!powerMode) return;
-  const rem=powerEnd-Date.now();
-  if(rem<=0){
-    powerMode=false; gc.classList.remove('pm');
-    pwrBar.classList.add('hidden');
-    recalcMs(); return;
+function tickEffects(){
+  const now=Date.now();
+
+  // Power mode timer
+  if(powerMode){
+    const rem=powerEnd-now;
+    if(rem<=0){
+      powerMode=false;
+      if(!fruitBoostEnd||now>=fruitBoostEnd) gc.classList.remove('pm');
+      pwrBar.classList.add('hidden');
+      recalcMs();
+    } else {
+      // FIX: cap percentage at 100 even when stacked
+      pwrFill.style.width=Math.min(100,(rem/FOOD.DIAMOND.powerDur)*100)+'%';
+    }
   }
-  pwrFill.style.width=Math.min(100,(rem/FOOD.DIAMOND.powerDur)*100)+'%';
+
+  // Fruit boost timer
+  if(fruitBoostEnd && now < fruitBoostEnd){
+    const rem=fruitBoostEnd-now;
+    boostFill.style.width=(rem/FOOD.FRUIT.boostDur*100)+'%';
+  } else if(fruitBoostEnd && now>=fruitBoostEnd){
+    fruitBoostEnd=0;
+    boostBar.classList.add('hidden');
+    if(!powerMode) gc.classList.remove('boost');
+    recalcMs();
+  }
 }
 
 // ── UI ──
@@ -570,8 +618,10 @@ function updateUI(){
   const lv=getLevel(score);
   lvlBadge.textContent=lv.lbl; lvlBadge.className=`badge ${lv.cls}`;
   spdBar.textContent=`SPEED: ${spdLabel(currentMs)}`;
-  comboEl.textContent=`×${combo}`;
-  comboEl.style.color=combo>=3?'#ff9900':combo>=2?'#ffff00':'var(--dim)';
+  if(combo>0){
+    comboEl.textContent=`×${combo}`;
+    comboEl.style.color=combo>=3?'#ff9900':combo>=2?'#ffff00':'var(--dim)';
+  }
 }
 
 let toastT;
@@ -603,10 +653,10 @@ function render(ts){
   ctx.clearRect(0,0,W,W);
   drawGrid();
   drawFoods(ts);
-  drawSnake(ts);
+  drawSnake();
   drawParts();
   tickParts();
-  tickPower();
+  tickEffects();
 }
 
 function drawGrid(){
@@ -624,12 +674,10 @@ function drawFoods(ts){
     const sc=1+.09*Math.sin(f.pulse);
     const gl=9+6*Math.sin(f.pulse);
     const cx=f.x*CELL+CELL/2, cy=f.y*CELL+CELL/2;
-    // Glow circle
     ctx.save();
     ctx.beginPath(); ctx.arc(cx,cy,(CELL/2-2)*sc,0,Math.PI*2);
     ctx.fillStyle=f.type.glow; ctx.shadowColor=f.type.color; ctx.shadowBlur=gl;
     ctx.fill(); ctx.restore();
-    // Emoji
     ctx.save();
     ctx.font=`${Math.floor(CELL*.7*sc)}px serif`;
     ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -652,7 +700,8 @@ function rRect(x,y,w,h,r){
   ctx.closePath();
 }
 
-function drawSnake(ts){
+function drawSnake(){
+  const fruitActive=fruitBoostEnd&&Date.now()<fruitBoostEnd;
   snake.forEach((s,i)=>{
     const x=s.x*CELL, y=s.y*CELL, isHead=i===0;
     const t=i/snake.length;
@@ -661,6 +710,9 @@ function drawSnake(ts){
       const ra=1-t;
       fill=`hsl(${195+ra*30},100%,${38+ra*22}%)`;
       sc='#00bfff'; bl=isHead?26:10+(1-t)*8;
+    } else if(fruitActive){
+      fill=`hsl(${25+t*15},100%,${isHead?52:35+(1-t)*14}%)`;
+      sc='#ff6b35'; bl=isHead?22:7+(1-t)*6;
     } else {
       fill=`hsl(${108+t*28},100%,${isHead?52:32+(1-t)*16}%)`;
       sc='#39ff14'; bl=isHead?22:7+(1-t)*7;
@@ -669,18 +721,18 @@ function drawSnake(ts){
     ctx.save();
     ctx.shadowColor=sc; ctx.shadowBlur=bl; ctx.fillStyle=fill;
     rRect(x+pad,y+pad,CELL-pad*2,CELL-pad*2,rad); ctx.fill();
-    // Shine
     ctx.fillStyle='rgba(255,255,255,.14)'; ctx.shadowBlur=0;
     rRect(x+pad+2,y+pad+2,(CELL-pad*2)*.38,(CELL-pad*2)*.28,3); ctx.fill();
     ctx.restore();
     if(isHead) drawEyes(x,y);
-    // Power sparkle particles
-    if(powerMode&&Math.random()<.025) spawnParts(x,y,'#00bfff',2,true);
+    // FIX: only spawn sparkles from head+few segments, not every segment
+    if(powerMode&&i<5&&Math.random()<.1) spawnParts(x,y,'#00bfff',1,true);
   });
 }
 
 function drawEyes(x,y){
-  const ec=powerMode?'#00ffff':'#ffffff';
+  const fruitActive=fruitBoostEnd&&Date.now()<fruitBoostEnd;
+  const ec=powerMode?'#00ffff':fruitActive?'#ffcc00':'#ffffff';
   let e1,e2;
   if(dir.x===1)       {e1={x:x+22,y:y+8}; e2={x:x+22,y:y+20};}
   else if(dir.x===-1) {e1={x:x+6, y:y+8}; e2={x:x+6, y:y+20};}
@@ -718,6 +770,11 @@ function startGame(){
 
 function endGame(reason){
   running=false; SFX.over();
+  // FIX: clean up all power/boost visuals immediately on death
+  powerMode=false; fruitBoostEnd=0;
+  gc.className='';
+  pwrBar.classList.add('hidden');
+  boostBar.classList.add('hidden');
   if(score>high){ high=score; localStorage.setItem('neonSnakeHi',high); newHigh.style.display='block'; }
   else newHigh.style.display='none';
   finalEl.textContent=score;
@@ -733,19 +790,42 @@ const KM={
   ArrowLeft:{x:-1,y:0}, a:{x:-1,y:0}, A:{x:-1,y:0},
   ArrowRight:{x:1,y:0}, d:{x:1,y:0}, D:{x:1,y:0},
 };
+
 document.addEventListener('keydown',e=>{
   const nd=KM[e.key];
   if(nd){
     e.preventDefault();
-    if(nd.x!==-dir.x||nd.y!==-dir.y) ndir=nd;
+    if(!running||paused) return;
+    // FIX: check against last queued direction, not current dir
+    // This prevents 180° reversal even when pressing quickly before next tick
+    const last=dirQueue.length>0?dirQueue[dirQueue.length-1]:dir;
+    if(nd.x!==-last.x||nd.y!==-last.y){
+      // Only queue if different from last queued direction
+      if(nd.x!==last.x||nd.y!==last.y){
+        dirQueue.push(nd);
+        if(dirQueue.length>2) dirQueue.shift(); // keep max 2 in queue
+      }
+    }
+    return;
   }
+  // Pause
   if((e.key==='p'||e.key==='P')&&running){
     paused=!paused;
     if(paused) ovPause.classList.remove('hidden');
     else { ovPause.classList.add('hidden'); lastTick=performance.now(); }
   }
+  // FIX: R key restarts at any time (during game, pause, or game over)
+  if(e.key==='r'||e.key==='R'){
+    if(!ovHTP.classList.contains('hidden')) return;
+    startGame();
+  }
+  // FIX: Space restarts when game over, or starts from start screen
+  if(e.key===' '){
+    e.preventDefault();
+    if(!ovGO.classList.contains('hidden')) startGame();
+    else if(!ovStart.classList.contains('hidden')) startGame();
+  }
 });
-
 
 // Buttons
 document.getElementById('btnStart').addEventListener('click',startGame);
@@ -755,7 +835,7 @@ document.getElementById('btnHTPBack').addEventListener('click',()=>{ ovHTP.class
 
 // ── Boot ──
 running=false;
-requestAnimationFrame(loop);
+animF=requestAnimationFrame(loop);
 </script>
 </body>
 </html>

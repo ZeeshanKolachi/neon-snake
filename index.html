@@ -299,7 +299,7 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
 <div class="wrap">
   <header>
     <h1>⚡ NEON SNAKE</h1>
-    <p>CYBERPUNK EDITION · AI ENHANCED <span class="v-badge">v3.0</span></p>
+    <p>CYBERPUNK EDITION · AI ENHANCED <span class="v-badge">v3.1</span></p>
   </header>
 
   <!-- Mobile stats bar (hidden on desktop) -->
@@ -379,7 +379,7 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
         <!-- START overlay -->
         <div class="ov start" id="ovStart">
           <h2>⚡ NEON SNAKE</h2>
-          <p style="color:var(--green);margin:4px 0;font-size:.76rem">CYBERPUNK EDITION v3.0</p>
+          <p style="color:var(--green);margin:4px 0;font-size:.76rem">CYBERPUNK EDITION v3.1</p>
           <div class="keys" style="margin:10px 0 5px">
             <div></div><div class="key">▲ W</div><div></div>
             <div class="key">◄ A</div><div class="key">▼ S</div><div class="key">► D</div>
@@ -392,7 +392,7 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
             🛡️ <span style="color:var(--red)">Shield</span> — Survive next collision<br>
             🧲 <span style="color:var(--yellow)">Magnet</span> — Auto-collect food 8s<br>
             ❄️ <span style="color:var(--ice)">Slow-Mo</span> — Half speed 6s<br>
-            👻 <span style="color:var(--purple)">Ghost</span> — Pass through tail 5s<br>
+            👻 <span style="color:var(--purple)">Ghost</span> — Walls wrap for 5s (no death)<br>
             🔥 3+ eats in 5s = <strong style="color:var(--orange)">COMBO</strong> up to <strong style="color:var(--orange)">×5!</strong>
           </div>
           <button class="btn" id="btnStart">▶ START GAME</button>
@@ -420,10 +420,10 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
             <div class="tip"><span class="tip-i">🥦</span><span class="tip-t"><strong>Vegetables:</strong> +5 pts, grow 1 segment. Cyan glow. Most common. Safe and reliable.</span></div>
             <div class="tip"><span class="tip-i">🍎</span><span class="tip-t"><strong>Fruits:</strong> +15 pts, grow 2. Grants a 3-second speed burst. Orange border activates.</span></div>
             <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Diamonds:</strong> +50 pts, grow 3. Activates POWER MODE — electric blue snake for 10 seconds. Rare!</span></div>
-            <div class="tip"><span class="tip-i">🛡️</span><span class="tip-t"><strong>Shield Power-up:</strong> Pick up to survive your NEXT wall or self-collision. One-time save shown by red border.</span></div>
+            <div class="tip"><span class="tip-i">🛡️</span><span class="tip-t"><strong>Shield Power-up:</strong> Pick up to survive your NEXT wall hit. One-time save shown by red dashed ring on snake head.</span></div>
             <div class="tip"><span class="tip-i">🧲</span><span class="tip-t"><strong>Magnet Power-up:</strong> Any food within 3 cells auto-snaps to you for 8 seconds. Yellow border shows it's active.</span></div>
             <div class="tip"><span class="tip-i">❄️</span><span class="tip-t"><strong>Slow-Mo Power-up:</strong> Cuts speed ~40% for 6 seconds. Invaluable at Legend level!</span></div>
-            <div class="tip"><span class="tip-i">👻</span><span class="tip-t"><strong>Ghost Power-up:</strong> Pass through your own tail without dying for 5 seconds. Purple glow.</span></div>
+            <div class="tip"><span class="tip-i">👻</span><span class="tip-t"><strong>Ghost Power-up:</strong> Pass through WALLS for 5 seconds — walls wrap instead of killing you. Purple glow. Stacks with Wrap Mode!</span></div>
             <div class="tip"><span class="tip-i">🌀</span><span class="tip-t"><strong>Wrap Mode (button):</strong> Walls become portals — snake exits the opposite wall. Toggle anytime.</span></div>
             <div class="tip"><span class="tip-i">🔥</span><span class="tip-t"><strong>Combo:</strong> Eat 3+ items in 5s = ×2 · 5+ = ×3 · 7+ = ×5! Chain power-ups for mega streaks.</span></div>
             <div class="tip"><span class="tip-i">🏆</span><span class="tip-t"><strong>Levels:</strong> Rookie (0) → Hunter (50) → Warrior (150) → Master (300) → Legend (500). Speed rises each level.</span></div>
@@ -483,7 +483,7 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
         <div><div class="fi-name sl">SLOW-MO</div><div class="fi-desc">Half speed 6s<br>Escape tight spots</div></div>
       </div>
       <div class="fi"><span class="fi-emoji">👻</span>
-        <div><div class="fi-name g">GHOST</div><div class="fi-desc">Pass thru tail 5s<br>Purple aura</div></div>
+        <div><div class="fi-name g">GHOST</div><div class="fi-desc">Pass thru walls 5s<br>Purple aura mode</div></div>
       </div>
       <h3 style="margin-top:11px">Pro Tips</h3>
       <div class="tip"><span class="tip-i">🔄</span><span class="tip-t">Use <strong>U-shapes</strong> — avoid cutting off your escape route.</span></div>
@@ -791,8 +791,11 @@ function tick(){
 
   const h={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
 
-  // Wall collision or wrap
-  if(wrapMode){
+  // Ghost mode: also makes walls passable temporarily
+  const ghostOn=ghostEnd&&Date.now()<ghostEnd;
+
+  // Wall collision — ONLY thing that ends the game (no self-collision death)
+  if(wrapMode || ghostOn){
     h.x=(h.x+GRID)%GRID;
     h.y=(h.y+GRID)%GRID;
   } else {
@@ -802,12 +805,7 @@ function tick(){
     }
   }
 
-  // Self collision (ghost bypasses)
-  const ghostOn=ghostEnd&&Date.now()<ghostEnd;
-  if(!ghostOn && snake.some(s=>s.x===h.x&&s.y===h.y)){
-    if(shieldActive){ triggerShield(h); return; }
-    endGame('Bit yourself!'); return;
-  }
+  // Snake passes through its own body freely — no self-collision death
 
   snake.unshift(h);
 

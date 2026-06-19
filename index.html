@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1120">
-<title>⚡ NEON SNAKE — Cyberpunk Edition v2</title>
+<title>⚡ NEON SNAKE — Cyberpunk Edition</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -148,7 +148,7 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 <div class="wrap">
   <header>
     <h1>⚡ NEON SNAKE</h1>
-    <p>CYBERPUNK EDITION · AI ENHANCED</p>
+    <p>CYBERPUNK EDITION · AI ENHANCED · v2.0</p>
   </header>
 
   <div class="row">
@@ -497,7 +497,7 @@ function tick(){
 
     // Combo
     const now=Date.now();
-    if(now-lastEat<3000) combo++; else combo=1;
+    if(now-lastEat<4000) combo++; else combo=1;
     lastEat=now;
     const isCombo=combo>=3;
 

@@ -2,136 +2,294 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1120">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>⚡ NEON SNAKE — Cyberpunk Edition</title>
 <style>
+/* ── Reset ── */
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --bg:#0a0a1a;--panel:#0d0d2b;
   --green:#39ff14;--cyan:#00ffff;--blue:#00bfff;
   --orange:#ff6b35;--purple:#bf5fff;--red:#ff4455;
+  --yellow:#ffcc00;--ice:#88ccff;--pink:#ff55aa;
   --dim:#5566aa;--txt:#d0d0ff;
 }
-body{background:var(--bg);color:var(--txt);font-family:'Courier New',monospace;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
-
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Courier New',monospace;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
 #bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
-.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;max-width:1120px;}
+/* ── Wrapper ── */
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;padding:10px 8px;width:100%;max-width:1220px;}
 
-header{text-align:center;margin-bottom:14px;}
-header h1{font-size:2.6rem;font-weight:900;letter-spacing:5px;
-  background:linear-gradient(90deg,#39ff14,#00ffff,#00bfff);
+/* ── Header ── */
+header{text-align:center;margin-bottom:10px;}
+header h1{
+  font-size:2.3rem;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(90deg,#39ff14,#00ffff,#00bfff,#bf5fff);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 18px #39ff1466);animation:hPulse 3s ease-in-out infinite;}
-@keyframes hPulse{0%,100%{filter:drop-shadow(0 0 18px #39ff1466);}50%{filter:drop-shadow(0 0 36px #00ffff66);}}
-header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
+  filter:drop-shadow(0 0 14px #39ff1455);
+  animation:hPulse 3s ease-in-out infinite;
+}
+@keyframes hPulse{0%,100%{filter:drop-shadow(0 0 14px #39ff1455);}50%{filter:drop-shadow(0 0 28px #00ffff55);}}
+header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
+.v-badge{
+  display:inline-block;background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);
+  border-radius:3px;padding:1px 6px;font-size:.55rem;letter-spacing:2px;
+  color:var(--green);margin-left:6px;vertical-align:middle;
+}
 
-.row{display:flex;gap:16px;align-items:flex-start;justify-content:center;width:100%;flex-wrap:wrap;}
+/* ── Mobile stats bar ── */
+.mob-stats{
+  display:none;flex-wrap:wrap;gap:6px;
+  align-items:center;justify-content:center;
+  background:rgba(13,13,43,.88);border:1px solid rgba(57,255,20,.18);
+  border-radius:8px;padding:6px 12px;margin-bottom:6px;width:100%;max-width:620px;
+}
+.ms{display:flex;flex-direction:column;align-items:center;min-width:52px;}
+.ms .lbl{font-size:.48rem;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.ms .val{font-size:1.1rem;font-weight:700;color:var(--green);text-shadow:0 0 8px var(--green);}
+.ms .val.c{font-size:.8rem;color:var(--cyan);}
 
-.panel{background:rgba(13,13,43,.88);border:1px solid rgba(57,255,20,.18);border-radius:12px;
-  padding:14px;min-width:190px;max-width:210px;backdrop-filter:blur(10px);}
-.panel h3{color:var(--green);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;
-  border-bottom:1px solid rgba(57,255,20,.18);padding-bottom:7px;margin-bottom:11px;}
+/* ── Main row ── */
+.row{display:flex;gap:10px;align-items:flex-start;justify-content:center;width:100%;flex-wrap:nowrap;}
 
-.stat{display:flex;flex-direction:column;margin-bottom:13px;}
-.stat-lbl{color:var(--dim);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;}
-.stat-val{font-size:1.9rem;font-weight:700;color:var(--green);text-shadow:0 0 16px var(--green);line-height:1.15;}
-.stat-val.sm{font-size:1.3rem;color:var(--cyan);text-shadow:0 0 14px var(--cyan);}
+/* ── Left panel ── */
+.panel{
+  background:rgba(13,13,43,.88);border:1px solid rgba(57,255,20,.18);border-radius:10px;
+  padding:11px;min-width:172px;max-width:190px;flex-shrink:0;
+  backdrop-filter:blur(10px);
+}
+.panel h3{
+  color:var(--green);font-size:.62rem;letter-spacing:3px;text-transform:uppercase;
+  border-bottom:1px solid rgba(57,255,20,.15);padding-bottom:6px;margin-bottom:9px;
+}
+.stat{display:flex;flex-direction:column;margin-bottom:10px;}
+.stat-lbl{color:var(--dim);font-size:.56rem;letter-spacing:2px;text-transform:uppercase;}
+.stat-val{font-size:1.75rem;font-weight:700;color:var(--green);text-shadow:0 0 12px var(--green);line-height:1.15;}
+.stat-val.sm{font-size:1.15rem;color:var(--cyan);text-shadow:0 0 10px var(--cyan);}
+.stat-val.xs{font-size:.95rem;color:var(--orange);text-shadow:0 0 8px var(--orange);}
+.bar-wrap{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-top:3px;}
+.bar-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+.bar-fill.len{background:linear-gradient(90deg,var(--green),var(--cyan));}
+.bar-fill.pwr{background:linear-gradient(90deg,var(--blue),var(--cyan));}
+.bar-fill.boost{background:linear-gradient(90deg,var(--orange),#ffcc00);}
+.bar-fill.magnet{background:linear-gradient(90deg,var(--yellow),#ff9900);}
+.bar-fill.slowmo{background:linear-gradient(90deg,var(--ice),#aaddff);}
+.bar-fill.ghost{background:linear-gradient(90deg,var(--purple),var(--pink));}
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:20px;font-size:.6rem;
+  letter-spacing:2px;font-weight:700;border:1px solid;margin-bottom:7px;
+}
+.l1{color:#39ff14;border-color:#39ff14;background:rgba(57,255,20,.08);}
+.l2{color:#ffff00;border-color:#ffff00;background:rgba(255,255,0,.08);}
+.l3{color:#ff9900;border-color:#ff9900;background:rgba(255,153,0,.08);}
+.l4{color:#ff4455;border-color:#ff4455;background:rgba(255,68,85,.08);}
+.l5{color:#bf5fff;border-color:#bf5fff;background:rgba(191,95,255,.08);}
 
-.bar-wrap{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:4px;}
-.bar-fill{height:100%;border-radius:3px;transition:width .3s ease;}
-.bar-fill.len{background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 7px var(--green);}
-.bar-fill.pwr{background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 7px var(--blue);}
-
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;
-  letter-spacing:2px;font-weight:700;border:1px solid;margin-bottom:10px;}
-.l1{color:#39ff14;border-color:#39ff14;background:rgba(57,255,20,.1);}
-.l2{color:#ffff00;border-color:#ffff00;background:rgba(255,255,0,.1);}
-.l3{color:#ff9900;border-color:#ff9900;background:rgba(255,153,0,.1);}
-.l4{color:#ff4455;border-color:#ff4455;background:rgba(255,68,85,.1);}
-.l5{color:#bf5fff;border-color:#bf5fff;background:rgba(191,95,255,.1);}
-
-.sbar{padding:5px 9px;border-radius:6px;font-size:.65rem;letter-spacing:1px;
-  text-align:center;margin-bottom:7px;border:1px solid;}
-.sbar.spd{color:var(--purple);border-color:rgba(191,95,255,.4);background:rgba(191,95,255,.1);}
-.sbar.pwr{color:var(--blue);border-color:rgba(0,191,255,.5);background:rgba(0,191,255,.1);
-  animation:pwrPulse 1s ease-in-out infinite;}
+/* ── Status bars ── */
+.sbar{
+  padding:4px 8px;border-radius:5px;font-size:.59rem;letter-spacing:1px;
+  text-align:center;margin-bottom:5px;border:1px solid;
+}
+.sbar.spd{color:var(--purple);border-color:rgba(191,95,255,.3);background:rgba(191,95,255,.07);}
+.sbar.pwr{color:var(--blue);border-color:rgba(0,191,255,.45);background:rgba(0,191,255,.07);
+  animation:glowB .9s ease-in-out infinite;}
+.sbar.boost-bar{color:var(--orange);border-color:rgba(255,107,53,.45);background:rgba(255,107,53,.07);
+  animation:glowO .5s ease-in-out infinite;}
+.sbar.shield-bar{color:var(--red);border-color:rgba(255,68,85,.5);background:rgba(255,68,85,.08);
+  animation:glowR .7s ease-in-out infinite;}
+.sbar.magnet-bar{color:var(--yellow);border-color:rgba(255,204,0,.45);background:rgba(255,204,0,.07);}
+.sbar.slowmo-bar{color:var(--ice);border-color:rgba(136,204,255,.45);background:rgba(136,204,255,.07);}
+.sbar.ghost-bar{color:var(--purple);border-color:rgba(191,95,255,.45);background:rgba(191,95,255,.07);
+  animation:glowP .6s ease-in-out infinite;}
+.sbar.wrap-on{color:var(--cyan);border-color:rgba(0,255,255,.35);background:rgba(0,255,255,.05);}
 .sbar.hidden{display:none;}
-@keyframes pwrPulse{0%,100%{box-shadow:0 0 5px rgba(0,191,255,.3);}50%{box-shadow:0 0 18px rgba(0,191,255,.8);}}
+@keyframes glowB{0%,100%{box-shadow:0 0 4px rgba(0,191,255,.2);}50%{box-shadow:0 0 14px rgba(0,191,255,.7);}}
+@keyframes glowO{0%,100%{box-shadow:0 0 4px rgba(255,107,53,.2);}50%{box-shadow:0 0 12px rgba(255,107,53,.7);}}
+@keyframes glowR{0%,100%{box-shadow:0 0 4px rgba(255,68,85,.2);}50%{box-shadow:0 0 16px rgba(255,68,85,.8);}}
+@keyframes glowP{0%,100%{box-shadow:0 0 4px rgba(191,95,255,.2);}50%{box-shadow:0 0 14px rgba(191,95,255,.7);}}
 
-.rp{background:rgba(13,13,43,.9);border:1px solid rgba(0,191,255,.2);border-radius:12px;
-  padding:14px;min-width:190px;max-width:210px;backdrop-filter:blur(10px);}
-.rp h3{color:var(--cyan);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;
-  border-bottom:1px solid rgba(0,191,255,.18);padding-bottom:7px;margin-bottom:11px;}
+/* ── Center column ── */
+.center-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
 
-.fi{display:flex;align-items:center;gap:9px;margin-bottom:9px;padding:7px;
-  border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
-  transition:all .25s;}
-.fi.flash{background:rgba(57,255,20,.08);border-color:rgba(57,255,20,.35);}
-.fi-emoji{font-size:1.3rem;width:28px;text-align:center;}
-.fi-name{font-size:.7rem;font-weight:700;}
-.fi-name.v{color:var(--cyan);}
-.fi-name.f{color:var(--orange);}
-.fi-name.d{color:var(--blue);}
-.fi-desc{font-size:.58rem;color:var(--dim);margin-top:2px;}
+/* ── Canvas scaler ── */
+.cbox-scaler{
+  position:relative;width:600px;height:600px;
+  transform-origin:top center;flex-shrink:0;
+}
+#gc{
+  display:block;border:2px solid rgba(57,255,20,.28);border-radius:8px;
+  box-shadow:0 0 22px rgba(57,255,20,.13),0 0 50px rgba(57,255,20,.05);
+}
+#gc.pm{border-color:rgba(0,191,255,.72);
+  box-shadow:0 0 26px rgba(0,191,255,.3),0 0 60px rgba(0,191,255,.1);}
+#gc.boost{border-color:rgba(255,107,53,.65);}
+#gc.shield-glow{border-color:rgba(255,68,85,.8);
+  box-shadow:0 0 26px rgba(255,68,85,.38),0 0 60px rgba(255,68,85,.13);}
+#gc.magnet-glow{border-color:rgba(255,204,0,.65);
+  box-shadow:0 0 22px rgba(255,204,0,.25),0 0 50px rgba(255,204,0,.08);}
+#gc.slowmo-glow{border-color:rgba(136,204,255,.65);
+  box-shadow:0 0 22px rgba(136,204,255,.25),0 0 50px rgba(136,204,255,.08);}
+#gc.ghost-glow{border-color:rgba(191,95,255,.72);
+  box-shadow:0 0 26px rgba(191,95,255,.3),0 0 60px rgba(191,95,255,.1);}
+#gc.wrap-active{outline:2px dashed rgba(0,255,255,.22);outline-offset:3px;}
 
-.tip{display:flex;gap:7px;align-items:flex-start;margin-bottom:9px;}
-.tip-i{font-size:.85rem;width:18px;flex-shrink:0;}
-.tip-t{font-size:.6rem;color:var(--dim);line-height:1.45;}
-.tip-t strong{color:var(--txt);}
-
-.cbox{position:relative;display:flex;flex-direction:column;align-items:center;}
-#gc{border:2px solid rgba(57,255,20,.35);border-radius:8px;display:block;
-  box-shadow:0 0 28px rgba(57,255,20,.18),0 0 60px rgba(57,255,20,.08);cursor:pointer;}
-#gc.pm{border-color:rgba(0,191,255,.75);
-  box-shadow:0 0 30px rgba(0,191,255,.35),0 0 70px rgba(0,191,255,.15);}
-#gc.fb{border-color:rgba(255,107,53,.75);
-  box-shadow:0 0 30px rgba(255,107,53,.3),0 0 70px rgba(255,107,53,.12);}
-
-.ov{position:absolute;top:0;left:0;width:100%;height:100%;
+/* ── Overlays ── */
+.ov{
+  position:absolute;top:0;left:0;width:100%;height:100%;
   background:rgba(10,10,26,.93);border-radius:8px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);padding:28px;}
+  align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);
+  padding:22px;text-align:center;
+}
 .ov.hidden{display:none;}
-.ov h2{font-size:1.8rem;letter-spacing:3px;margin-bottom:8px;}
-.ov.start h2{background:linear-gradient(90deg,#39ff14,#00ffff);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.ov.go h2{color:var(--red);text-shadow:0 0 18px var(--red);}
-.ov p{color:var(--dim);font-size:.8rem;text-align:center;margin:3px 0;}
-.final{font-size:2.8rem;color:var(--green);text-shadow:0 0 28px var(--green);margin:12px 0;}
-
-.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0;}
-.key{background:rgba(57,255,20,.09);border:1px solid rgba(57,255,20,.28);border-radius:4px;
-  padding:3px 7px;font-size:.62rem;text-align:center;color:var(--green);}
-
-.btn{margin-top:16px;padding:10px 28px;background:transparent;
+.ov h2{font-size:1.65rem;letter-spacing:3px;margin-bottom:6px;}
+.ov.start h2{
+  background:linear-gradient(90deg,#39ff14,#00ffff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ov.go h2{color:var(--red);text-shadow:0 0 14px var(--red);}
+.ov.pause-ov h2{color:var(--purple);text-shadow:0 0 14px var(--purple);}
+.final{font-size:2.5rem;color:var(--green);text-shadow:0 0 22px var(--green);margin:10px 0;}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0;}
+.key{
+  background:rgba(57,255,20,.07);border:1px solid rgba(57,255,20,.22);
+  border-radius:4px;padding:3px 6px;font-size:.58rem;text-align:center;color:var(--green);
+}
+.btn{
+  margin-top:12px;padding:9px 22px;background:transparent;
   border:2px solid var(--green);color:var(--green);
-  font-family:'Courier New',monospace;font-size:.9rem;letter-spacing:3px;
-  border-radius:6px;cursor:pointer;text-transform:uppercase;transition:all .25s;
-  box-shadow:0 0 13px rgba(57,255,20,.25);}
-.btn:hover{background:rgba(57,255,20,.12);box-shadow:0 0 28px rgba(57,255,20,.55);transform:scale(1.04);}
-.btn.s{border-color:var(--cyan);color:var(--cyan);font-size:.75rem;
-  padding:7px 18px;margin-top:8px;box-shadow:0 0 9px rgba(0,255,255,.18);}
-.btn.s:hover{background:rgba(0,255,255,.09);box-shadow:0 0 22px rgba(0,255,255,.45);}
-
-.htp-body{max-width:420px;width:100%;overflow-y:auto;max-height:400px;padding-right:4px;}
+  font-family:'Courier New',monospace;font-size:.82rem;letter-spacing:3px;
+  border-radius:6px;cursor:pointer;text-transform:uppercase;transition:all .22s;
+  box-shadow:0 0 10px rgba(57,255,20,.18);touch-action:manipulation;
+}
+.btn:hover{background:rgba(57,255,20,.1);box-shadow:0 0 22px rgba(57,255,20,.48);transform:scale(1.04);}
+.btn.s{border-color:var(--cyan);color:var(--cyan);font-size:.68rem;
+  padding:6px 14px;margin-top:6px;box-shadow:0 0 7px rgba(0,255,255,.13);}
+.btn.s:hover{background:rgba(0,255,255,.08);box-shadow:0 0 18px rgba(0,255,255,.38);}
+.htp-body{max-width:400px;width:100%;overflow-y:auto;max-height:340px;padding-right:4px;}
 .htp-body::-webkit-scrollbar{width:4px;}
-.htp-body::-webkit-scrollbar-track{background:rgba(255,255,255,.05);}
+.htp-body::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
 .htp-body::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px;}
 
-#toast{position:fixed;top:16px;left:50%;
-  transform:translateX(-50%) translateY(-70px);
-  background:rgba(13,13,43,.96);border:1px solid var(--green);color:var(--green);
-  padding:9px 22px;border-radius:28px;font-size:.82rem;letter-spacing:2px;
-  z-index:200;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 0 18px rgba(57,255,20,.35);pointer-events:none;}
-#toast.show{transform:translateX(-50%) translateY(0);}
-#toast.dmd{border-color:var(--blue);color:var(--blue);box-shadow:0 0 28px rgba(0,191,255,.55);}
-#toast.combo{border-color:var(--orange);color:var(--orange);box-shadow:0 0 28px rgba(255,107,53,.55);}
+/* ── Control bar ── */
+.ctrl-bar{
+  display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;
+  justify-content:center;align-items:center;width:100%;max-width:630px;
+}
+.ctrl-btn{
+  padding:9px 15px;border-radius:7px;border:1px solid;
+  font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:2px;
+  cursor:pointer;text-transform:uppercase;transition:all .2s;
+  background:rgba(13,13,43,.92);min-width:88px;text-align:center;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+.ctrl-btn.play{color:var(--green);border-color:rgba(57,255,20,.38);box-shadow:0 0 6px rgba(57,255,20,.12);}
+.ctrl-btn.play:hover{background:rgba(57,255,20,.1);box-shadow:0 0 16px rgba(57,255,20,.4);}
+.ctrl-btn.restart{color:var(--orange);border-color:rgba(255,107,53,.38);box-shadow:0 0 6px rgba(255,107,53,.1);}
+.ctrl-btn.restart:hover{background:rgba(255,107,53,.1);box-shadow:0 0 14px rgba(255,107,53,.4);}
+.ctrl-btn.wrap{color:var(--dim);border-color:rgba(85,102,170,.25);}
+.ctrl-btn.wrap:hover{color:var(--cyan);background:rgba(0,255,255,.06);}
+.ctrl-btn.wrap.on{color:var(--cyan);border-color:rgba(0,255,255,.42);
+  box-shadow:0 0 10px rgba(0,255,255,.22);animation:wPulse 2s infinite;}
+@keyframes wPulse{0%,100%{box-shadow:0 0 6px rgba(0,255,255,.18);}50%{box-shadow:0 0 16px rgba(0,255,255,.5);}}
+.ctrl-btn.wrap:hover{color:var(--cyan);}
+.ctrl-btn.htp{color:var(--purple);border-color:rgba(191,95,255,.32);}
+.ctrl-btn.htp:hover{background:rgba(191,95,255,.08);box-shadow:0 0 12px rgba(191,95,255,.3);}
 
-.bpop{position:absolute;font-size:1.1rem;font-weight:700;pointer-events:none;
-  z-index:20;animation:floatUp 1.4s ease forwards;text-shadow:0 0 9px currentColor;}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-55px) scale(1.4);}}
+/* ── D-Pad ── */
+.dpad{display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:11px;user-select:none;}
+.dp-row{display:flex;gap:5px;align-items:center;justify-content:center;}
+.dp-btn{
+  width:58px;height:58px;border-radius:10px;
+  border:2px solid rgba(57,255,20,.32);
+  background:rgba(13,13,43,.92);color:var(--green);
+  font-size:1.35rem;cursor:pointer;transition:all .12s;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 7px rgba(57,255,20,.1);
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+.dp-btn:hover,.dp-btn:active{
+  background:rgba(57,255,20,.14);border-color:rgba(57,255,20,.65);
+  box-shadow:0 0 16px rgba(57,255,20,.4);transform:scale(.94);
+}
+.dp-center{width:58px;height:58px;display:flex;align-items:center;justify-content:center;}
+.dp-dot{width:18px;height:18px;border-radius:50%;
+  background:rgba(57,255,20,.12);border:1px solid rgba(57,255,20,.22);}
+
+/* ── Right panel ── */
+.rp{
+  background:rgba(13,13,43,.88);border:1px solid rgba(0,191,255,.18);border-radius:10px;
+  padding:11px;min-width:172px;max-width:190px;flex-shrink:0;
+  backdrop-filter:blur(10px);
+}
+.rp h3{color:var(--cyan);font-size:.62rem;letter-spacing:3px;text-transform:uppercase;
+  border-bottom:1px solid rgba(0,191,255,.15);padding-bottom:6px;margin-bottom:9px;}
+.fi{
+  display:flex;align-items:center;gap:7px;margin-bottom:7px;padding:5px;
+  border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+  transition:all .2s;
+}
+.fi.flash{background:rgba(57,255,20,.07);border-color:rgba(57,255,20,.3);}
+.fi-emoji{font-size:1.15rem;width:24px;text-align:center;}
+.fi-name{font-size:.66rem;font-weight:700;}
+.fi-name.v{color:var(--cyan);}   .fi-name.f{color:var(--orange);}
+.fi-name.d{color:var(--blue);}   .fi-name.s{color:var(--red);}
+.fi-name.m{color:var(--yellow);} .fi-name.sl{color:var(--ice);}
+.fi-name.g{color:var(--purple);}
+.fi-desc{font-size:.55rem;color:var(--dim);margin-top:2px;line-height:1.3;}
+.tip{display:flex;gap:5px;align-items:flex-start;margin-bottom:7px;}
+.tip-i{font-size:.78rem;width:15px;flex-shrink:0;}
+.tip-t{font-size:.57rem;color:var(--dim);line-height:1.4;}
+.tip-t strong{color:var(--txt);}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;top:12px;left:50%;
+  transform:translateX(-50%) translateY(-65px);
+  background:rgba(13,13,43,.97);border:1px solid var(--green);color:var(--green);
+  padding:7px 18px;border-radius:24px;font-size:.76rem;letter-spacing:2px;
+  z-index:200;transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 0 14px rgba(57,255,20,.28);pointer-events:none;white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.dmd{border-color:var(--blue);color:var(--blue);box-shadow:0 0 22px rgba(0,191,255,.5);}
+#toast.combo{border-color:var(--orange);color:var(--orange);box-shadow:0 0 22px rgba(255,107,53,.5);}
+#toast.boost{border-color:var(--orange);color:var(--orange);}
+#toast.shield{border-color:var(--red);color:var(--red);box-shadow:0 0 22px rgba(255,68,85,.5);}
+#toast.magnet{border-color:var(--yellow);color:var(--yellow);box-shadow:0 0 22px rgba(255,204,0,.5);}
+#toast.slowmo{border-color:var(--ice);color:var(--ice);box-shadow:0 0 22px rgba(136,204,255,.5);}
+#toast.ghost{border-color:var(--purple);color:var(--purple);box-shadow:0 0 22px rgba(191,95,255,.5);}
+#toast.saved{border-color:var(--red);color:var(--red);box-shadow:0 0 26px rgba(255,68,85,.7);}
+#toast.wrap{border-color:var(--cyan);color:var(--cyan);}
+
+/* ── Bonus popup ── */
+.bpop{
+  position:absolute;font-size:1rem;font-weight:700;pointer-events:none;
+  z-index:20;animation:floatUp 1.3s ease forwards;text-shadow:0 0 8px currentColor;white-space:nowrap;
+}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(1.3);}}
+
+/* ── Responsive ── */
+@media(max-width:1080px){.rp,.panel{min-width:158px;max-width:172px;}}
+@media(max-width:940px){.rp{display:none;}}
+@media(max-width:760px){
+  .panel{display:none;}
+  .mob-stats{display:flex;}
+  header h1{font-size:1.75rem;}
+  header p{font-size:.6rem;}
+}
+@media(max-width:480px){
+  header h1{font-size:1.45rem;letter-spacing:2px;}
+  .ctrl-btn{font-size:.6rem;padding:8px 11px;min-width:76px;}
+  .dp-btn{width:64px;height:64px;font-size:1.45rem;}
+}
 </style>
 </head>
 <body>
@@ -141,12 +299,22 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
 <div class="wrap">
   <header>
     <h1>⚡ NEON SNAKE</h1>
-    <p>CYBERPUNK EDITION · AI ENHANCED · v2.0</p>
+    <p>CYBERPUNK EDITION · AI ENHANCED <span class="v-badge">v3.0</span></p>
   </header>
 
+  <!-- Mobile stats bar (hidden on desktop) -->
+  <div class="mob-stats" id="mobStats">
+    <div class="ms"><span class="lbl">Score</span><span class="val" id="mScore">0</span></div>
+    <div class="ms"><span class="lbl">Best</span><span class="val c" id="mHigh">0</span></div>
+    <div class="ms"><span class="lbl">Length</span><span class="val" id="mLen">3</span></div>
+    <div class="ms"><span class="lbl">Combo</span><span class="val" id="mCombo" style="font-size:.9rem;color:var(--dim)">—</span></div>
+    <div class="ms"><span class="lbl">Level</span><span class="badge l1" id="mLvl" style="margin:0;font-size:.55rem">LVL 1</span></div>
+  </div>
+
   <div class="row">
+    <!-- ── Left Stats Panel ── -->
     <div class="panel">
-      <h3>Stats</h3>
+      <h3>📊 Stats</h3>
       <div class="stat">
         <span class="stat-lbl">Score</span>
         <span class="stat-val" id="scoreEl">0</span>
@@ -157,17 +325,43 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
       </div>
       <div class="stat">
         <span class="stat-lbl">Length</span>
-        <span class="stat-val" id="lenEl" style="font-size:1.3rem">3</span>
+        <span class="stat-val sm" id="lenEl">3</span>
         <div class="bar-wrap"><div class="bar-fill len" id="lenBar" style="width:6%"></div></div>
       </div>
       <div class="stat">
+        <span class="stat-lbl">Items Eaten</span>
+        <span class="stat-val xs" id="eatenEl">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-lbl">Best Combo</span>
+        <span class="stat-val xs" id="bestComboEl">×1</span>
+      </div>
+      <div class="stat">
         <span class="stat-lbl">Level</span>
-        <div style="margin-top:5px"><span class="badge l1" id="lvlBadge">LVL 1 · ROOKIE</span></div>
+        <div style="margin-top:4px"><span class="badge l1" id="lvlBadge">LVL 1 · ROOKIE</span></div>
       </div>
       <div class="sbar spd" id="spdBar">SPEED: SLOW</div>
+      <div class="sbar wrap-on hidden" id="wrapBar">🌀 WRAP MODE ON</div>
       <div class="sbar pwr hidden" id="pwrBar">
-        ⚡ DIAMOND POWER ⚡
-        <div class="bar-wrap" style="margin-top:5px"><div class="bar-fill pwr" id="pwrFill" style="width:100%"></div></div>
+        ⚡ DIAMOND POWER
+        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill pwr" id="pwrFill" style="width:100%"></div></div>
+      </div>
+      <div class="sbar boost-bar hidden" id="boostBar">
+        🍎 SPEED BOOST
+        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill boost" id="boostFill" style="width:100%"></div></div>
+      </div>
+      <div class="sbar shield-bar hidden" id="shieldBar">🛡️ SHIELD READY</div>
+      <div class="sbar magnet-bar hidden" id="magnetBar">
+        🧲 MAGNET
+        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill magnet" id="magnetFill" style="width:100%"></div></div>
+      </div>
+      <div class="sbar slowmo-bar hidden" id="slowmoBar">
+        ❄️ SLOW-MO
+        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill slowmo" id="slowmoFill" style="width:100%"></div></div>
+      </div>
+      <div class="sbar ghost-bar hidden" id="ghostBar">
+        👻 GHOST MODE
+        <div class="bar-wrap" style="margin-top:4px"><div class="bar-fill ghost" id="ghostFill" style="width:100%"></div></div>
       </div>
       <div class="stat" style="margin-top:6px">
         <span class="stat-lbl">Combo</span>
@@ -175,572 +369,938 @@ header p{color:var(--dim);font-size:.75rem;letter-spacing:4px;margin-top:3px;}
       </div>
     </div>
 
-    <div class="cbox">
-      <canvas id="gc" width="600" height="600"></canvas>
+    <!-- ── Center: Canvas + Controls + D-Pad ── -->
+    <div class="center-col" id="centerCol">
 
-      <div class="ov start" id="ovStart">
-        <h2>⚡ NEON SNAKE</h2>
-        <p style="color:var(--green);margin:8px 0;font-size:.78rem">CYBERPUNK EDITION</p>
-        <div class="keys">
-          <div></div><div class="key">▲ W</div><div></div>
-          <div class="key">◄ A</div><div class="key">▼ S</div><div class="key">► D</div>
+      <!-- Canvas + overlays (this div is scaled for mobile) -->
+      <div class="cbox-scaler" id="cboxScaler">
+        <canvas id="gc" width="600" height="600"></canvas>
+
+        <!-- START overlay -->
+        <div class="ov start" id="ovStart">
+          <h2>⚡ NEON SNAKE</h2>
+          <p style="color:var(--green);margin:4px 0;font-size:.76rem">CYBERPUNK EDITION v3.0</p>
+          <div class="keys" style="margin:10px 0 5px">
+            <div></div><div class="key">▲ W</div><div></div>
+            <div class="key">◄ A</div><div class="key">▼ S</div><div class="key">► D</div>
+          </div>
+          <p style="font-size:.66rem;color:var(--dim)">Arrow Keys · WASD · P=Pause · R / Space=Restart</p>
+          <div style="margin:10px 0;font-size:.67rem;line-height:1.95;text-align:left;max-width:330px">
+            💎 <span style="color:var(--blue)">Diamond</span> — Power Mode · +50 pts<br>
+            🍎 <span style="color:var(--orange)">Fruit</span> — Speed Boost 3s · +15 pts<br>
+            🥦 <span style="color:var(--cyan)">Veggie</span> — Steady growth · +5 pts<br>
+            🛡️ <span style="color:var(--red)">Shield</span> — Survive next collision<br>
+            🧲 <span style="color:var(--yellow)">Magnet</span> — Auto-collect food 8s<br>
+            ❄️ <span style="color:var(--ice)">Slow-Mo</span> — Half speed 6s<br>
+            👻 <span style="color:var(--purple)">Ghost</span> — Pass through tail 5s<br>
+            🔥 3+ eats in 5s = <strong style="color:var(--orange)">COMBO</strong> up to <strong style="color:var(--orange)">×5!</strong>
+          </div>
+          <button class="btn" id="btnStart">▶ START GAME</button>
+          <button class="btn s" id="btnHowS">? HOW TO PLAY</button>
         </div>
-        <p style="font-size:.72rem">Arrow Keys too &nbsp;·&nbsp; P = Pause &nbsp;·&nbsp; Enter = Start</p>
-        <p style="margin-top:11px;font-size:.7rem;line-height:1.7">
-          💎 <span style="color:var(--blue)">Diamond</span> = POWER MODE · +50 pts<br>
-          🍎 <span style="color:var(--orange)">Fruit</span> = Speed burst · +15 pts<br>
-          🥦 <span style="color:var(--cyan)">Veggie</span> = Steady growth · +5 pts<br>
-          🔥 Eat 3 items within 4s = COMBO ×2
-        </p>
-        <button class="btn" id="btnStart">START GAME</button>
-        <button class="btn s" id="btnHow">HOW TO PLAY</button>
-      </div>
 
-      <div class="ov go hidden" id="ovGO">
-        <h2>GAME OVER</h2>
-        <p>Final Score</p>
-        <div class="final" id="finalEl">0</div>
-        <div id="newHigh" style="display:none;color:var(--cyan);font-size:.85rem;letter-spacing:2px;margin-bottom:8px">★ NEW HIGH SCORE! ★</div>
-        <p id="deathEl" style="font-size:.7rem;color:var(--dim)"></p>
-        <p style="font-size:.62rem;color:var(--dim);margin-top:6px">Enter or click to play again</p>
-        <button class="btn" id="btnRestart">PLAY AGAIN</button>
-      </div>
-
-      <div class="ov hidden" id="ovHTP" style="text-align:left">
-        <h2 style="color:var(--cyan);font-size:1.3rem;text-align:center;margin-bottom:14px">HOW TO PLAY</h2>
-        <div class="htp-body">
-          <div class="tip"><span class="tip-i">🎮</span><span class="tip-t"><strong>Movement:</strong> WASD or Arrow Keys. Cannot reverse direction. P = pause, Enter = start/restart.</span></div>
-          <div class="tip"><span class="tip-i">🥦</span><span class="tip-t"><strong>Vegetables:</strong> +5 pts, grow 1 segment. Cyan glow. Most common. Safe and reliable.</span></div>
-          <div class="tip"><span class="tip-i">🍎</span><span class="tip-t"><strong>Fruits:</strong> +15 pts, grow 2 segments. Triggers a 3-second speed burst — snake turns orange. Uncommon.</span></div>
-          <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Diamonds:</strong> +50 pts, grow 3 segments. Activates POWER MODE — snake turns electric blue for 10 seconds. Rare!</span></div>
-          <div class="tip"><span class="tip-i">⚡</span><span class="tip-t"><strong>Power Mode:</strong> Snake glows electric blue. Speed increases. Eat another diamond to extend duration.</span></div>
-          <div class="tip"><span class="tip-i">🔥</span><span class="tip-t"><strong>Combo:</strong> Eat 3+ items within 4 seconds of each other — all points are doubled! Chain combos for big scores.</span></div>
-          <div class="tip"><span class="tip-i">🏆</span><span class="tip-t"><strong>Levels:</strong> Speed increases every 50 pts. 5 levels — Rookie → Hunter → Warrior → Master → Legend.</span></div>
-          <div class="tip"><span class="tip-i">🔄</span><span class="tip-t"><strong>Food Moves:</strong> Food repositions when eaten. Always 3 items on board at once.</span></div>
-          <div class="tip"><span class="tip-i">💡</span><span class="tip-t"><strong>Pro Tip:</strong> Move in U-shapes or spirals. Always plan your exit before chasing a diamond!</span></div>
+        <!-- GAME OVER overlay -->
+        <div class="ov go hidden" id="ovGO">
+          <h2>GAME OVER</h2>
+          <p style="color:var(--dim);font-size:.75rem">Final Score</p>
+          <div class="final" id="finalEl">0</div>
+          <div id="newHigh" style="display:none;color:var(--cyan);font-size:.82rem;letter-spacing:2px;margin-bottom:7px">★ NEW HIGH SCORE! ★</div>
+          <p id="deathEl" style="font-size:.68rem;color:var(--dim);margin-bottom:4px"></p>
+          <p id="goStatsEl" style="font-size:.62rem;color:var(--dim)"></p>
+          <button class="btn" id="btnRestart">↺ PLAY AGAIN</button>
+          <p style="font-size:.58rem;color:var(--dim);margin-top:7px">Press R · Space · or tap RESTART button</p>
         </div>
-        <button class="btn s" id="btnHTPBack" style="margin-top:16px;align-self:center">← BACK</button>
+
+        <!-- HOW TO PLAY overlay -->
+        <div class="ov hidden" id="ovHTP" style="text-align:left">
+          <h2 style="color:var(--cyan);font-size:1.25rem;text-align:center;margin-bottom:12px">HOW TO PLAY</h2>
+          <div class="htp-body">
+            <div class="tip"><span class="tip-i">🎮</span><span class="tip-t"><strong>Move:</strong> WASD / Arrow Keys on desktop. Tap D-Pad buttons or swipe on mobile. Cannot reverse direction.</span></div>
+            <div class="tip"><span class="tip-i">⌨️</span><span class="tip-t"><strong>Keys:</strong> P = Pause/Resume · R = Restart · Space = Start/Restart · D-Pad = directional buttons on screen</span></div>
+            <div class="tip"><span class="tip-i">🥦</span><span class="tip-t"><strong>Vegetables:</strong> +5 pts, grow 1 segment. Cyan glow. Most common. Safe and reliable.</span></div>
+            <div class="tip"><span class="tip-i">🍎</span><span class="tip-t"><strong>Fruits:</strong> +15 pts, grow 2. Grants a 3-second speed burst. Orange border activates.</span></div>
+            <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Diamonds:</strong> +50 pts, grow 3. Activates POWER MODE — electric blue snake for 10 seconds. Rare!</span></div>
+            <div class="tip"><span class="tip-i">🛡️</span><span class="tip-t"><strong>Shield Power-up:</strong> Pick up to survive your NEXT wall or self-collision. One-time save shown by red border.</span></div>
+            <div class="tip"><span class="tip-i">🧲</span><span class="tip-t"><strong>Magnet Power-up:</strong> Any food within 3 cells auto-snaps to you for 8 seconds. Yellow border shows it's active.</span></div>
+            <div class="tip"><span class="tip-i">❄️</span><span class="tip-t"><strong>Slow-Mo Power-up:</strong> Cuts speed ~40% for 6 seconds. Invaluable at Legend level!</span></div>
+            <div class="tip"><span class="tip-i">👻</span><span class="tip-t"><strong>Ghost Power-up:</strong> Pass through your own tail without dying for 5 seconds. Purple glow.</span></div>
+            <div class="tip"><span class="tip-i">🌀</span><span class="tip-t"><strong>Wrap Mode (button):</strong> Walls become portals — snake exits the opposite wall. Toggle anytime.</span></div>
+            <div class="tip"><span class="tip-i">🔥</span><span class="tip-t"><strong>Combo:</strong> Eat 3+ items in 5s = ×2 · 5+ = ×3 · 7+ = ×5! Chain power-ups for mega streaks.</span></div>
+            <div class="tip"><span class="tip-i">🏆</span><span class="tip-t"><strong>Levels:</strong> Rookie (0) → Hunter (50) → Warrior (150) → Master (300) → Legend (500). Speed rises each level.</span></div>
+            <div class="tip"><span class="tip-i">💡</span><span class="tip-t"><strong>Pro:</strong> Use U-shapes and spirals. Grab Shield before diamonds. Magnet + Wrap = insane streaks.</span></div>
+          </div>
+          <button class="btn s" id="btnHTPBack" style="align-self:center;margin-top:14px">← BACK</button>
+        </div>
+
+        <!-- PAUSE overlay -->
+        <div class="ov pause-ov hidden" id="ovPause">
+          <h2>⏸ PAUSED</h2>
+          <p style="margin-top:10px;font-size:.82rem">Press <span style="color:var(--green)">P</span> or tap <span style="color:var(--green)">RESUME</span></p>
+          <p style="font-size:.62rem;margin-top:6px;color:var(--dim)">R = restart anytime</p>
+        </div>
+      </div><!-- /cbox-scaler -->
+
+      <!-- ── On-screen Control Buttons ── -->
+      <div class="ctrl-bar">
+        <button class="ctrl-btn play" id="btnPlay">▶ START</button>
+        <button class="ctrl-btn restart" id="btnRestartCtrl">↺ RESTART</button>
+        <button class="ctrl-btn wrap" id="btnWrap">🌀 WRAP: OFF</button>
+        <button class="ctrl-btn htp"  id="btnHowCtrl">? HOW TO PLAY</button>
       </div>
 
-      <div class="ov hidden" id="ovPause">
-        <h2 style="color:var(--purple)">PAUSED</h2>
-        <p style="margin-top:10px">Press <span style="color:var(--green)">P</span> or <span style="color:var(--green)">Enter</span> to resume</p>
+      <!-- ── Mobile D-Pad ── -->
+      <div class="dpad">
+        <div class="dp-row"><button class="dp-btn" id="dpUp">▲</button></div>
+        <div class="dp-row">
+          <button class="dp-btn" id="dpLeft">◄</button>
+          <div class="dp-center"><div class="dp-dot"></div></div>
+          <button class="dp-btn" id="dpRight">►</button>
+        </div>
+        <div class="dp-row"><button class="dp-btn" id="dpDown">▼</button></div>
       </div>
-    </div>
+    </div><!-- /center-col -->
 
+    <!-- ── Right Panel: Food Guide + Power-Ups + Tips ── -->
     <div class="rp">
       <h3>Food Guide</h3>
-      <div class="fi" id="fiVeg">
-        <span class="fi-emoji">🥦</span>
-        <div><div class="fi-name v">VEGETABLE</div><div class="fi-desc">+5 pts · grow +1<br>Cyan glow · common</div></div>
+      <div class="fi" id="fiVeg"><span class="fi-emoji">🥦</span>
+        <div><div class="fi-name v">VEGETABLE</div><div class="fi-desc">+5 pts · grow +1<br>Common · cyan glow</div></div>
       </div>
-      <div class="fi" id="fiFruit">
-        <span class="fi-emoji">🍎</span>
-        <div><div class="fi-name f">FRUIT</div><div class="fi-desc">+15 pts · grow +2<br>3s speed burst · uncommon</div></div>
+      <div class="fi" id="fiFruit"><span class="fi-emoji">🍎</span>
+        <div><div class="fi-name f">FRUIT</div><div class="fi-desc">+15 pts · grow +2<br>Speed boost 3s</div></div>
       </div>
-      <div class="fi" id="fiDmd">
-        <span class="fi-emoji">💎</span>
-        <div><div class="fi-name d">DIAMOND</div><div class="fi-desc">+50 pts · grow +3<br>⚡ POWER MODE · rare</div></div>
+      <div class="fi" id="fiDmd"><span class="fi-emoji">💎</span>
+        <div><div class="fi-name d">DIAMOND</div><div class="fi-desc">+50 pts · grow +3<br>⚡ Power mode 10s</div></div>
       </div>
-
-      <h3 style="margin-top:14px">Pro Tips</h3>
-      <div class="tip"><span class="tip-i">🔄</span><span class="tip-t">Use <strong>U-shapes</strong> and <strong>spirals</strong> — avoid cutting yourself off.</span></div>
-      <div class="tip"><span class="tip-i">💎</span><span class="tip-t"><strong>Always</strong> plan an exit before chasing a diamond.</span></div>
-      <div class="tip"><span class="tip-i">🔥</span><span class="tip-t">Chain 3 items in <strong>4 seconds</strong> for a <strong>×2 COMBO</strong>!</span></div>
-      <div class="tip"><span class="tip-i">⚡</span><span class="tip-t">Eat a diamond during power mode to <strong>stack the timer</strong>.</span></div>
-      <div class="tip"><span class="tip-i">🍎</span><span class="tip-t">Fruit gives a <strong>speed burst</strong> — use it to reposition fast!</span></div>
-      <div class="tip"><span class="tip-i">🏃</span><span class="tip-t">At HYPER/INSANE speed, <strong>anticipate</strong>, don't react.</span></div>
+      <h3 style="margin-top:11px">Power-Ups</h3>
+      <div class="fi"><span class="fi-emoji">🛡️</span>
+        <div><div class="fi-name s">SHIELD</div><div class="fi-desc">Survive 1 hit<br>Wall or self saved!</div></div>
+      </div>
+      <div class="fi"><span class="fi-emoji">🧲</span>
+        <div><div class="fi-name m">MAGNET</div><div class="fi-desc">Auto-collect 8s<br>3-cell radius</div></div>
+      </div>
+      <div class="fi"><span class="fi-emoji">❄️</span>
+        <div><div class="fi-name sl">SLOW-MO</div><div class="fi-desc">Half speed 6s<br>Escape tight spots</div></div>
+      </div>
+      <div class="fi"><span class="fi-emoji">👻</span>
+        <div><div class="fi-name g">GHOST</div><div class="fi-desc">Pass thru tail 5s<br>Purple aura</div></div>
+      </div>
+      <h3 style="margin-top:11px">Pro Tips</h3>
+      <div class="tip"><span class="tip-i">🔄</span><span class="tip-t">Use <strong>U-shapes</strong> — avoid cutting off your escape route.</span></div>
+      <div class="tip"><span class="tip-i">🛡️</span><span class="tip-t">Grab <strong>Shield</strong> before chasing a risky diamond.</span></div>
+      <div class="tip"><span class="tip-i">🔥</span><span class="tip-t">Chain 3+ eats in 5s for <strong>up to ×5 COMBO!</strong></span></div>
+      <div class="tip"><span class="tip-i">🌀</span><span class="tip-t"><strong>Wrap Mode</strong> turns walls into shortcuts.</span></div>
+      <div class="tip"><span class="tip-i">🧲</span><span class="tip-t">Magnet + Wrap Mode = <strong>insane combo streaks.</strong></span></div>
+      <div class="tip"><span class="tip-i">❄️</span><span class="tip-t"><strong>Slow-Mo</strong> at HYPER/INSANE speed = lifesaver.</span></div>
     </div>
-  </div>
-</div>
+  </div><!-- /row -->
+</div><!-- /wrap -->
 
 <script>
-const GRID=20, CELL=30, W=600;
-const MAX_PARTS=180;
+// ═══════════════════════════════════════════════════════════
+//  NEON SNAKE v3.0 — Cyberpunk Edition
+//  10 Top Features (from research into top snake games):
+//  1. 🛡️  Shield power-up (Snake Rivals)
+//  2. 🧲  Magnet power-up (Snake.io)
+//  3. ❄️  Slow-Mo power-up (Google Snake)
+//  4. 👻  Ghost power-up (Snake Rivals)
+//  5. 🌀  Wrap/Portal mode (Google Snake portal mode)
+//  6. 🔥  ×5 combo system (advanced snake games)
+//  7. 📱  Mobile D-Pad + swipe controls
+//  8. 🎮  On-screen Start/Pause/Resume/Restart buttons
+//  9. ⚡  Power-up drop items (separate from food)
+//  10. 📊  Session stats (eaten count, best combo)
+// ═══════════════════════════════════════════════════════════
 
-const FOOD={
-  VEG:{
+const GRID = 20, CELL = 30, W = 600;
+const MAX_PARTS = 220;
+
+/* ── Food ── */
+const FOOD = {
+  VEG: {
     emojis:['🥦','🥕','🌽','🥒','🫑','🧅','🥑'],
-    color:'#00ffff',glow:'rgba(0,255,255,.55)',
-    score:5,growth:1,rarity:.6,id:'veg',speedBurst:0
+    color:'#00ffff', glow:'rgba(0,255,255,.5)',
+    score:5, growth:1, rarity:.6, id:'veg'
   },
-  FRUIT:{
+  FRUIT: {
     emojis:['🍎','🍊','🍇','🍓','🍑','🍋','🍒','🍈'],
-    color:'#ff6b35',glow:'rgba(255,107,53,.55)',
-    score:15,growth:2,rarity:.3,id:'fruit',speedBurst:3000
+    color:'#ff6b35', glow:'rgba(255,107,53,.5)',
+    score:15, growth:2, rarity:.3, boostDur:3000, id:'fruit'
   },
-  DIAMOND:{
+  DIAMOND: {
     emojis:['💎'],
-    color:'#00bfff',glow:'rgba(0,191,255,.75)',
-    score:50,growth:3,rarity:.1,powerDur:10000,id:'diamond',speedBurst:0
+    color:'#00bfff', glow:'rgba(0,191,255,.7)',
+    score:50, growth:3, rarity:.1, powerDur:10000, id:'diamond'
   }
 };
 
-const LEVELS=[
-  {min:0,  lbl:'LVL 1 · ROOKIE', cls:'l1',ms:185},
-  {min:50, lbl:'LVL 2 · HUNTER', cls:'l2',ms:148},
-  {min:150,lbl:'LVL 3 · WARRIOR',cls:'l3',ms:115},
-  {min:300,lbl:'LVL 4 · MASTER', cls:'l4',ms:88},
-  {min:500,lbl:'LVL 5 · LEGEND', cls:'l5',ms:62},
+/* ── Power-ups ── */
+const PWU = {
+  SHIELD: { id:'shield', emoji:'🛡️', color:'#ff4455', glow:'rgba(255,68,85,.65)',  label:'🛡️ SHIELD ACTIVATED!',  gcCls:'shield-glow', dur:0 },
+  MAGNET: { id:'magnet', emoji:'🧲', color:'#ffcc00', glow:'rgba(255,204,0,.65)',   label:'🧲 MAGNET ON!',          gcCls:'magnet-glow', dur:8000 },
+  SLOWMO: { id:'slowmo', emoji:'❄️', color:'#88ccff', glow:'rgba(136,204,255,.6)', label:'❄️ SLOW-MO ACTIVE!',    gcCls:'slowmo-glow', dur:6000 },
+  GHOST:  { id:'ghost',  emoji:'👻', color:'#bf5fff', glow:'rgba(191,95,255,.65)', label:'👻 GHOST MODE!',          gcCls:'ghost-glow',  dur:5000 },
+};
+const PWU_LIST = Object.values(PWU);
+
+/* ── Levels ── */
+const LEVELS = [
+  {min:0,   lbl:'LVL 1 · ROOKIE',  cls:'l1', ms:185},
+  {min:50,  lbl:'LVL 2 · HUNTER',  cls:'l2', ms:148},
+  {min:150, lbl:'LVL 3 · WARRIOR', cls:'l3', ms:115},
+  {min:300, lbl:'LVL 4 · MASTER',  cls:'l4', ms:88},
+  {min:500, lbl:'LVL 5 · LEGEND',  cls:'l5', ms:62},
 ];
 
-const gc      =document.getElementById('gc');
-const ctx     =gc.getContext('2d');
-const bgC     =document.getElementById('bgCanvas');
-const bgX     =bgC.getContext('2d');
-const scoreEl =document.getElementById('scoreEl');
-const highEl  =document.getElementById('highEl');
-const lenEl   =document.getElementById('lenEl');
-const lenBar  =document.getElementById('lenBar');
-const lvlBadge=document.getElementById('lvlBadge');
-const spdBar  =document.getElementById('spdBar');
-const pwrBar  =document.getElementById('pwrBar');
-const pwrFill =document.getElementById('pwrFill');
-const comboEl =document.getElementById('comboEl');
-const ovStart =document.getElementById('ovStart');
-const ovGO    =document.getElementById('ovGO');
-const ovHTP   =document.getElementById('ovHTP');
-const ovPause =document.getElementById('ovPause');
-const finalEl =document.getElementById('finalEl');
-const newHigh =document.getElementById('newHigh');
-const deathEl =document.getElementById('deathEl');
-const toast   =document.getElementById('toast');
+/* ── DOM ── */
+const gc         = document.getElementById('gc');
+const ctx        = gc.getContext('2d');
+const bgC        = document.getElementById('bgCanvas');
+const bgX        = bgC.getContext('2d');
+const scoreEl    = document.getElementById('scoreEl');
+const highEl     = document.getElementById('highEl');
+const lenEl      = document.getElementById('lenEl');
+const lenBar     = document.getElementById('lenBar');
+const eatenEl    = document.getElementById('eatenEl');
+const bestComboEl= document.getElementById('bestComboEl');
+const lvlBadge   = document.getElementById('lvlBadge');
+const spdBar     = document.getElementById('spdBar');
+const wrapBar    = document.getElementById('wrapBar');
+const pwrBar     = document.getElementById('pwrBar');
+const pwrFill    = document.getElementById('pwrFill');
+const boostBar   = document.getElementById('boostBar');
+const boostFill  = document.getElementById('boostFill');
+const shieldBar  = document.getElementById('shieldBar');
+const magnetBar  = document.getElementById('magnetBar');
+const magnetFill = document.getElementById('magnetFill');
+const slowmoBar  = document.getElementById('slowmoBar');
+const slowmoFill = document.getElementById('slowmoFill');
+const ghostBar   = document.getElementById('ghostBar');
+const ghostFill  = document.getElementById('ghostFill');
+const comboEl    = document.getElementById('comboEl');
+const ovStart    = document.getElementById('ovStart');
+const ovGO       = document.getElementById('ovGO');
+const ovHTP      = document.getElementById('ovHTP');
+const ovPause    = document.getElementById('ovPause');
+const finalEl    = document.getElementById('finalEl');
+const newHigh    = document.getElementById('newHigh');
+const deathEl    = document.getElementById('deathEl');
+const goStatsEl  = document.getElementById('goStatsEl');
+const toast      = document.getElementById('toast');
+const cboxScaler = document.getElementById('cboxScaler');
+const btnPlay    = document.getElementById('btnPlay');
+// Mobile
+const mScore = document.getElementById('mScore');
+const mHigh  = document.getElementById('mHigh');
+const mLen   = document.getElementById('mLen');
+const mCombo = document.getElementById('mCombo');
+const mLvl   = document.getElementById('mLvl');
 
-// ── Audio ──
-let AC=null;
-function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;}
-function tone(freq,type,dur,vol=.28,delay=0){
+/* ── Audio (Web Audio API — no files) ── */
+let AC = null;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+function tone(freq,type,dur,vol=.24,delay=0){
   try{
     const a=ac(),o=a.createOscillator(),g=a.createGain();
-    o.connect(g);g.connect(a.destination);
-    o.type=type;o.frequency.setValueAtTime(freq,a.currentTime+delay);
+    o.connect(g); g.connect(a.destination);
+    o.type=type; o.frequency.setValueAtTime(freq,a.currentTime+delay);
     g.gain.setValueAtTime(vol,a.currentTime+delay);
     g.gain.exponentialRampToValueAtTime(.001,a.currentTime+delay+dur);
-    o.start(a.currentTime+delay);o.stop(a.currentTime+delay+dur);
+    o.start(a.currentTime+delay); o.stop(a.currentTime+delay+dur);
   }catch(e){}
 }
 const SFX={
-  veg(){tone(440,'sine',.12,.18);tone(560,'sine',.1,.13,.07);},
-  fruit(){[523,659,784].forEach((f,i)=>tone(f,'triangle',.15,.22,i*.08));},
-  diamond(){[261,330,392,523,659,784,1047].forEach((f,i)=>tone(f,'sine',.3,.28,i*.06));},
-  over(){[220,185,155,110].forEach((f,i)=>tone(f,'sawtooth',.32,.38,i*.12));},
-  lvlup(){[392,523,659,784,1047].forEach((f,i)=>tone(f,'square',.15,.18,i*.08));},
-  combo(){[523,659,784,1047,1318].forEach((f,i)=>tone(f,'triangle',.18,.22,i*.05));},
+  veg(){    tone(440,'sine',.1,.15); tone(560,'sine',.08,.11,.07); },
+  fruit(){  [523,659,784].forEach((f,i)=>tone(f,'triangle',.13,.19,i*.07)); },
+  diamond(){ [261,330,392,523,659,784,1047].forEach((f,i)=>tone(f,'sine',.28,.25,i*.055)); },
+  over(){   [220,185,155,110].forEach((f,i)=>tone(f,'sawtooth',.3,.35,i*.11)); },
+  lvlup(){  [392,523,659,784,1047].forEach((f,i)=>tone(f,'square',.13,.15,i*.07)); },
+  combo(){  [523,659,784,1047,1318].forEach((f,i)=>tone(f,'triangle',.16,.19,i*.045)); },
+  boost(){  [440,554,659].forEach((f,i)=>tone(f,'triangle',.1,.17,i*.055)); },
+  shield(){ tone(880,'sine',.18,.27); tone(1100,'sine',.14,.21,.12); },
+  magnet(){ [330,440,550,660].forEach((f,i)=>tone(f,'triangle',.18,.19,i*.07)); },
+  slowmo(){ [220,196,164,138].forEach((f,i)=>tone(f,'sine',.22,.17,i*.09)); },
+  ghost(){  [440,370,294,220].forEach((f,i)=>tone(f,'sine',.2,.21,i*.07)); },
+  saved(){  [110,220,440,880].forEach((f,i)=>tone(f,'triangle',.12,.27,i*.06)); },
 };
 
-// ── Background ──
+/* ── Animated background ── */
 let stars=[],bgW=0,bgH=0;
 function initBg(){
-  bgW=bgC.width=window.innerWidth;bgH=bgC.height=window.innerHeight;
-  stars=Array.from({length:130},()=>({
+  bgW=bgC.width=window.innerWidth; bgH=bgC.height=window.innerHeight;
+  stars=Array.from({length:140},()=>({
     x:Math.random()*bgW,y:Math.random()*bgH,
-    r:.3+Math.random()*1.4,op:.2+Math.random()*.6,tw:Math.random()*Math.PI*2
+    r:.3+Math.random()*1.4,tw:Math.random()*Math.PI*2,
+    op:.15+Math.random()*.55
   }));
 }
-window.addEventListener('resize',initBg);
-initBg();
-
 function drawBg(ts){
   bgX.clearRect(0,0,bgW,bgH);
   const gr=bgX.createRadialGradient(bgW/2,bgH/2,0,bgW/2,bgH/2,bgW*.72);
-  gr.addColorStop(0,'#0e0e30');gr.addColorStop(1,'#0a0a1a');
-  bgX.fillStyle=gr;bgX.fillRect(0,0,bgW,bgH);
-  bgX.save();bgX.globalAlpha=.045+.02*Math.sin(ts/5000);
-  const ng=bgX.createRadialGradient(bgW*.28,bgH*.38,0,bgW*.28,bgH*.38,bgW*.38);
-  ng.addColorStop(0,'#4400cc');ng.addColorStop(1,'transparent');
-  bgX.fillStyle=ng;bgX.fillRect(0,0,bgW,bgH);bgX.restore();
-  bgX.save();bgX.globalAlpha=.03+.015*Math.sin(ts/7000+1.5);
-  const ng2=bgX.createRadialGradient(bgW*.72,bgH*.6,0,bgW*.72,bgH*.6,bgW*.3);
-  ng2.addColorStop(0,'#003388');ng2.addColorStop(1,'transparent');
-  bgX.fillStyle=ng2;bgX.fillRect(0,0,bgW,bgH);bgX.restore();
-  stars.forEach(s=>{
-    s.tw+=.018;
-    const a=s.op*(.65+.35*Math.sin(s.tw));
-    bgX.beginPath();bgX.arc(s.x,s.y,s.r,0,Math.PI*2);
-    bgX.fillStyle=`rgba(200,215,255,${a})`;bgX.fill();
+  gr.addColorStop(0,'#0e0e32'); gr.addColorStop(1,'#0a0a1a');
+  bgX.fillStyle=gr; bgX.fillRect(0,0,bgW,bgH);
+  [[bgW*.28,bgH*.38,'#4400cc',.044],[bgW*.72,bgH*.62,'#003388',.029]].forEach(([x,y,c,a])=>{
+    bgX.save(); bgX.globalAlpha=a+.014*Math.sin(ts/6000);
+    const n=bgX.createRadialGradient(x,y,0,x,y,bgW*.38);
+    n.addColorStop(0,c); n.addColorStop(1,'transparent');
+    bgX.fillStyle=n; bgX.fillRect(0,0,bgW,bgH); bgX.restore();
   });
-  bgX.save();bgX.globalAlpha=.012;
-  for(let x=0;x<bgW;x+=3){bgX.fillStyle='#fff';bgX.fillRect(x,0,1,bgH);}
+  stars.forEach(s=>{
+    s.tw+=.016;
+    bgX.beginPath(); bgX.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bgX.fillStyle=`rgba(200,215,255,${s.op*(.6+.4*Math.sin(s.tw))})`; bgX.fill();
+  });
+  bgX.save(); bgX.globalAlpha=.01;
+  for(let x=0;x<bgW;x+=3){ bgX.fillStyle='#fff'; bgX.fillRect(x,0,1,bgH); }
   bgX.restore();
 }
+window.addEventListener('resize',()=>{ initBg(); scaleGame(); });
+initBg();
 
-// ── Particles ──
+/* ── Particles ── */
 let parts=[];
-function spawnParts(px,py,color,n=12,big=false){
-  if(parts.length>=MAX_PARTS)return;
-  const allowed=Math.min(n,MAX_PARTS-parts.length);
-  for(let i=0;i<allowed;i++){
+function spawnParts(px,py,color,n=10,big=false){
+  for(let i=0;i<n;i++){
     const a=(Math.PI*2*i/n)+Math.random()*.5;
-    const sp=big?3.5+Math.random()*4:1.5+Math.random()*2.5;
+    const sp=big?3+Math.random()*3.5:1.4+Math.random()*2.2;
     parts.push({x:px+CELL/2,y:py+CELL/2,
       vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
-      life:1,decay:.045+Math.random()*.04,
-      r:big?3+Math.random()*3:2+Math.random()*2,color,big});
+      life:1,decay:.038+Math.random()*.038,
+      r:big?2.5+Math.random()*2.5:1.8+Math.random()*1.8,
+      color,big});
   }
+  if(parts.length>MAX_PARTS) parts.splice(0,parts.length-MAX_PARTS);
 }
 function tickParts(){
   parts=parts.filter(p=>p.life>0);
-  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life-=p.decay;p.vx*=.97;});
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.07;p.life-=p.decay;p.vx*=.97;});
 }
 function drawParts(){
   parts.forEach(p=>{
-    ctx.save();ctx.globalAlpha=p.life;
-    ctx.shadowColor=p.color;ctx.shadowBlur=p.big?10:6;ctx.fillStyle=p.color;
-    if(p.big){ctx.beginPath();star5(ctx,p.x,p.y,p.r,p.r*.45);ctx.fill();}
-    else{ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);ctx.fill();}
+    ctx.save(); ctx.globalAlpha=p.life;
+    ctx.shadowColor=p.color; ctx.shadowBlur=p.big?9:5; ctx.fillStyle=p.color;
+    if(p.big){ ctx.beginPath(); star5(ctx,p.x,p.y,p.r,p.r*.42); ctx.fill(); }
+    else      { ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2); ctx.fill(); }
     ctx.restore();
   });
 }
 function star5(c,cx,cy,ro,ri){
-  const sp=Math.PI/5;let r=(Math.PI/2)*3;
+  const sp=Math.PI/5; let r=-Math.PI/2;
   c.moveTo(cx,cy-ro);
   for(let i=0;i<5;i++){
-    c.lineTo(cx+Math.cos(r)*ro,cy+Math.sin(r)*ro);r+=sp;
-    c.lineTo(cx+Math.cos(r)*ri,cy+Math.sin(r)*ri);r+=sp;
+    c.lineTo(cx+Math.cos(r)*ro,cy+Math.sin(r)*ro); r+=sp;
+    c.lineTo(cx+Math.cos(r)*ri,cy+Math.sin(r)*ri); r+=sp;
   }
   c.closePath();
 }
 
-// ── State ──
-let snake,dir,ndir,foods,score,high,running,paused;
-let powerMode,powerEnd,currentMs,fruitBoostEnd;
-let combo,lastEat,animF,lastTick;
+/* ── Game state ── */
+let snake,dir,dirQueue,foods,pwuItems;
+let score,high,running,paused,wrapMode=false;
+let powerMode,powerEnd,fruitBoostEnd;
+let shieldActive,magnetEnd,slowMoEnd,ghostEnd;
+let eatLog=[],bestCombo=1,totalEaten=0,currentMs;
+let animF=null,lastTick=0;
 
-high=+localStorage.getItem('neonSnakeHi')||0;
-highEl.textContent=high;
+high = +localStorage.getItem('neonSnakeHi')||0;
+highEl.textContent=high; mHigh.textContent=high;
 
-function getLevel(s){for(let i=LEVELS.length-1;i>=0;i--)if(s>=LEVELS[i].min)return LEVELS[i];return LEVELS[0];}
-function rnd(n){return Math.floor(Math.random()*n);}
-function freeCell(c){return !snake.some(s=>s.x===c.x&&s.y===c.y)&&!foods.some(f=>f.x===c.x&&f.y===c.y);}
-function randFree(){
-  let c,t=0;
-  do{c={x:rnd(GRID),y:rnd(GRID)};t++;}while(!freeCell(c)&&t<400);
-  return freeCell(c)?c:null;
+/* ── Helpers ── */
+function getLevel(s){ for(let i=LEVELS.length-1;i>=0;i--) if(s>=LEVELS[i].min) return LEVELS[i]; return LEVELS[0]; }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function freeCell(c){
+  return !snake.some(s=>s.x===c.x&&s.y===c.y) &&
+         !foods.some(f=>f.x===c.x&&f.y===c.y) &&
+         !pwuItems.some(p=>p.x===c.x&&p.y===c.y);
 }
-
-function pickType(){
+function randFree(){
+  let c,t=0; do{ c={x:rnd(GRID),y:rnd(GRID)}; t++; }while(!freeCell(c)&&t<400);
+  return t<400?c:null;
+}
+function pickFood(){
   const r=Math.random();
-  if(r<FOOD.DIAMOND.rarity)return FOOD.DIAMOND;
-  if(r<FOOD.DIAMOND.rarity+FOOD.FRUIT.rarity)return FOOD.FRUIT;
+  if(r<FOOD.DIAMOND.rarity) return FOOD.DIAMOND;
+  if(r<FOOD.DIAMOND.rarity+FOOD.FRUIT.rarity) return FOOD.FRUIT;
   return FOOD.VEG;
 }
 function spawnFood(){
-  const c=randFree();
-  if(!c)return;
-  const t=pickType();
+  const c=randFree(); if(!c) return;
+  const t=pickFood();
   foods.push({...c,type:t,emoji:t.emojis[rnd(t.emojis.length)],pulse:Math.random()*Math.PI*2});
 }
-
-function initGame(){
-  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
-  dir={x:1,y:0};ndir={x:1,y:0};
-  foods=[];score=0;
-  powerMode=false;powerEnd=0;fruitBoostEnd=0;
-  combo=0;lastEat=0;parts=[];
-  currentMs=LEVELS[0].ms;
-  // Reset all visual state cleanly
-  gc.className='';
-  pwrBar.classList.add('hidden');
-  pwrFill.style.width='100%';
-  spawnFood();spawnFood();spawnFood();
-  updateUI();
+function trySpawnPwu(){
+  if(pwuItems.length>0) return;        // only 1 power-up on board at once
+  if(Math.random()>0.28) return;       // 28% chance per food eaten
+  const type=PWU_LIST[rnd(PWU_LIST.length)];
+  const c=randFree(); if(!c) return;
+  pwuItems.push({...c,type,born:Date.now(),pulse:Math.random()*Math.PI*2});
 }
-
 function recalcMs(){
   const lv=getLevel(score);
   let ms=lv.ms;
-  if(Date.now()<fruitBoostEnd) ms=Math.max(48,Math.floor(ms*.7));
-  if(powerMode) ms=Math.max(48,ms-22);
+  if(powerMode)              ms=Math.max(50,ms-22);
+  if(Date.now()<fruitBoostEnd) ms=Math.max(50,ms-28);
+  if(slowMoEnd&&Date.now()<slowMoEnd)  ms=Math.min(320,ms*1.85);
   currentMs=ms;
 }
-
+function getMultiplier(){
+  const now=Date.now();
+  eatLog=eatLog.filter(t=>now-t<5000);
+  const n=eatLog.length;
+  if(n>=7) return 5;
+  if(n>=5) return 3;
+  if(n>=3) return 2;
+  return 1;
+}
 function spdLabel(ms){
-  if(ms>=165)return 'SLOW';
-  if(ms>=130)return 'NORMAL';
-  if(ms>=100)return 'FAST';
-  if(ms>=72) return 'HYPER';
+  if(ms>=165) return 'SLOW';
+  if(ms>=130) return 'NORMAL';
+  if(ms>=100) return 'FAST';
+  if(ms>=72)  return 'HYPER';
   return 'INSANE';
 }
 
-// ── Tick ──
-function tick(){
-  if(!running||paused)return;
-  dir={...ndir};
-  const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+/* ── Canvas classes ── */
+const ALL_GC=['pm','boost','shield-glow','magnet-glow','slowmo-glow','ghost-glow','wrap-active'];
+function setGC(cls,on){ on?gc.classList.add(cls):gc.classList.remove(cls); }
+function clearGCAll(){ ALL_GC.forEach(c=>{ if(c!=='wrap-active') gc.classList.remove(c); }); }
 
-  if(h.x<0||h.x>=GRID||h.y<0||h.y>=GRID){endGame('Hit the wall!');return;}
-  if(snake.some(s=>s.x===h.x&&s.y===h.y)){endGame('Bit yourself!');return;}
+/* ── Init ── */
+function initGame(){
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir={x:1,y:0}; dirQueue=[];
+  foods=[]; pwuItems=[];
+  score=0; powerMode=false; powerEnd=0;
+  fruitBoostEnd=0; shieldActive=false;
+  magnetEnd=0; slowMoEnd=0; ghostEnd=0;
+  eatLog=[]; bestCombo=1; totalEaten=0; parts=[];
+  clearGCAll();
+  if(wrapMode) setGC('wrap-active',true);
+  [pwrBar,boostBar,shieldBar,magnetBar,slowmoBar,ghostBar].forEach(b=>b.classList.add('hidden'));
+  comboEl.textContent='—'; comboEl.style.color='var(--dim)';
+  mCombo.textContent='—'; mCombo.style.color='var(--dim)';
+  recalcMs();
+  spawnFood(); spawnFood(); spawnFood();
+  updateUI();
+}
+
+/* ── Tick (one game step) ── */
+function tick(){
+  if(!running||paused) return;
+  if(dirQueue.length>0) dir=dirQueue.shift();
+
+  const h={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+
+  // Wall collision or wrap
+  if(wrapMode){
+    h.x=(h.x+GRID)%GRID;
+    h.y=(h.y+GRID)%GRID;
+  } else {
+    if(h.x<0||h.x>=GRID||h.y<0||h.y>=GRID){
+      if(shieldActive){ triggerShield(h); return; }
+      endGame('Hit the wall!'); return;
+    }
+  }
+
+  // Self collision (ghost bypasses)
+  const ghostOn=ghostEnd&&Date.now()<ghostEnd;
+  if(!ghostOn && snake.some(s=>s.x===h.x&&s.y===h.y)){
+    if(shieldActive){ triggerShield(h); return; }
+    endGame('Bit yourself!'); return;
+  }
 
   snake.unshift(h);
 
+  // Power-up pickup
+  const pi=pwuItems.findIndex(p=>p.x===h.x&&p.y===h.y);
+  if(pi!==-1){ activatePwu(pwuItems.splice(pi,1)[0].type); }
+
+  // Magnet: auto-collect nearby food
+  if(magnetEnd&&Date.now()<magnetEnd){
+    const snap=foods.filter(f=>Math.abs(f.x-h.x)<=3&&Math.abs(f.y-h.y)<=3);
+    foods=foods.filter(f=>!(Math.abs(f.x-h.x)<=3&&Math.abs(f.y-h.y)<=3));
+    snap.forEach(f=>collectFood(f,h,true));
+    while(foods.length<3) spawnFood();
+  }
+
+  // Regular food pickup
   const fi=foods.findIndex(f=>f.x===h.x&&f.y===h.y);
   if(fi!==-1){
-    const fd=foods[fi];
-    foods.splice(fi,1);
-
-    const now=Date.now();
-    if(now-lastEat<4000)combo++;else combo=1;
-    lastEat=now;
-    const isCombo=combo>=3;
-
-    let pts=fd.type.score;
-    if(isCombo){pts*=2;SFX.combo();showToast('🔥 COMBO ×2!','combo');}
-
-    for(let i=1;i<fd.type.growth;i++)snake.push({...snake[snake.length-1]});
-
-    const prev=getLevel(score);
-    score+=pts;
-    const next=getLevel(score);
-    if(next.min>prev.min){SFX.lvlup();showToast(`⚡ ${next.lbl}!`,'green');}
-
-    if(fd.type===FOOD.VEG){
-      SFX.veg();spawnParts(h.x*CELL,h.y*CELL,'#00ffff',10);flashFI('fiVeg');
-    } else if(fd.type===FOOD.FRUIT){
-      SFX.fruit();spawnParts(h.x*CELL,h.y*CELL,'#ff6b35',14);flashFI('fiFruit');
-      fruitBoostEnd=Date.now()+FOOD.FRUIT.speedBurst;
-      gc.classList.remove('fb');void gc.offsetWidth;gc.classList.add('fb');
-      if(!isCombo)showToast('🍎 SPEED BURST!','combo');
-    } else {
-      SFX.diamond();
-      spawnParts(h.x*CELL,h.y*CELL,'#00bfff',20,true);
-      spawnParts(h.x*CELL,h.y*CELL,'#ffffff',8,true);
-      spawnParts(h.x*CELL,h.y*CELL,'#bf5fff',6,true);
-      flashFI('fiDmd');activatePower();
-    }
-
-    bpop(h.x*CELL+CELL/2,h.y*CELL,isCombo?`+${pts}🔥`:`+${pts}`,fd.type.color);
-    while(foods.length<3)spawnFood();
+    collectFood(foods.splice(fi,1)[0],h,false);
+    while(foods.length<3) spawnFood();
+    trySpawnPwu();
   } else {
     snake.pop();
   }
-  recalcMs();
+
+  // Expire power-up items after 12s
+  const now=Date.now();
+  pwuItems=pwuItems.filter(p=>now-p.born<12000);
+
   updateUI();
+}
+
+function triggerShield(h){
+  shieldActive=false;
+  shieldBar.classList.add('hidden');
+  setGC('shield-glow',false);
+  SFX.saved();
+  showToast('🛡️ SHIELD SAVED YOU!','saved');
+  spawnParts(snake[0].x*CELL,snake[0].y*CELL,'#ff4455',18,true);
+  // Snake bounces — don't move, just stay
+  updateUI();
+}
+
+function collectFood(fd,h,magnet){
+  totalEaten++;
+  const now=Date.now();
+  eatLog.push(now);
+  eatLog=eatLog.filter(t=>now-t<5000);
+  const mult=getMultiplier();
+  if(mult>bestCombo) bestCombo=mult;
+  const isCombo=mult>1;
+  const pts=fd.type.score*mult;
+
+  if(isCombo){ SFX.combo(); showToast(`🔥 COMBO ×${mult}!`,'combo'); }
+
+  // Grow
+  for(let i=1;i<fd.type.growth;i++) snake.push({...snake[snake.length-1]});
+
+  const prevLv=getLevel(score);
+  score+=pts;
+  if(score>high){ high=score; localStorage.setItem('neonSnakeHi',high); }
+  const nextLv=getLevel(score);
+  if(nextLv.min>prevLv.min){ SFX.lvlup(); showToast(`⚡ ${nextLv.lbl}!`,''); }
+
+  // Food-specific effects
+  const px=h.x*CELL, py=h.y*CELL;
+  if(fd.type===FOOD.VEG){
+    SFX.veg(); spawnParts(px,py,'#00ffff',10); flashFI('fiVeg');
+  } else if(fd.type===FOOD.FRUIT){
+    SFX.fruit(); spawnParts(px,py,'#ff6b35',13); flashFI('fiFruit');
+    fruitBoostEnd=now+FOOD.FRUIT.boostDur;
+    setGC('boost',true); boostBar.classList.remove('hidden');
+    if(!isCombo&&!magnet) showToast('🍎 SPEED BOOST!','boost');
+    SFX.boost();
+  } else {
+    SFX.diamond();
+    spawnParts(px,py,'#00bfff',18,true);
+    spawnParts(px,py,'#fff',7,true);
+    spawnParts(px,py,'#bf5fff',5,true);
+    flashFI('fiDmd'); activatePower();
+  }
+
+  if(!magnet) bpop(h.x*CELL+CELL/2,h.y*CELL, isCombo?`+${pts} ×${mult}!`:`+${pts}`, fd.type.color);
+  recalcMs();
 }
 
 function activatePower(){
   const rem=powerMode?Math.max(0,powerEnd-Date.now()):0;
   powerMode=true;
   powerEnd=Date.now()+FOOD.DIAMOND.powerDur+rem;
-  gc.classList.remove('fb');
-  gc.classList.add('pm');
-  pwrBar.classList.remove('hidden');
-  showToast('💎 DIAMOND POWER MODE!','dmd');
+  setGC('pm',true); pwrBar.classList.remove('hidden');
   recalcMs();
 }
 
-function tickPower(){
-  if(!powerMode)return;
-  const rem=powerEnd-Date.now();
-  if(rem<=0){
-    powerMode=false;gc.classList.remove('pm');
-    pwrBar.classList.add('hidden');recalcMs();return;
+function activatePwu(type){
+  bpop(snake[0].x*CELL+CELL/2,snake[0].y*CELL,type.emoji,type.color);
+  spawnParts(snake[0].x*CELL,snake[0].y*CELL,type.color,12);
+  showToast(type.label, type.id);
+
+  if(type===PWU.SHIELD){
+    shieldActive=true;
+    shieldBar.classList.remove('hidden');
+    setGC('shield-glow',true);
+    SFX.shield();
+  } else if(type===PWU.MAGNET){
+    magnetEnd=Date.now()+PWU.MAGNET.dur;
+    magnetBar.classList.remove('hidden');
+    setGC('magnet-glow',true);
+    SFX.magnet();
+  } else if(type===PWU.SLOWMO){
+    slowMoEnd=Date.now()+PWU.SLOWMO.dur;
+    slowmoBar.classList.remove('hidden');
+    setGC('slowmo-glow',true);
+    SFX.slowmo(); recalcMs();
+  } else if(type===PWU.GHOST){
+    ghostEnd=Date.now()+PWU.GHOST.dur;
+    ghostBar.classList.remove('hidden');
+    setGC('ghost-glow',true);
+    SFX.ghost();
   }
-  // Show how much of the current 10s window remains (handles stacking cleanly)
-  const windowRem=rem>FOOD.DIAMOND.powerDur?FOOD.DIAMOND.powerDur:rem;
-  pwrFill.style.width=(windowRem/FOOD.DIAMOND.powerDur*100)+'%';
-  // Remove fruit boost border if diamond is active
-  if(gc.classList.contains('fb'))gc.classList.remove('fb');
 }
 
-// ── UI ──
+/* ── Effects timer tick ── */
+function tickEffects(){
+  const now=Date.now();
+
+  if(powerMode){
+    const rem=powerEnd-now;
+    if(rem<=0){ powerMode=false; setGC('pm',false); pwrBar.classList.add('hidden'); recalcMs(); }
+    else pwrFill.style.width=Math.min(100,(rem/FOOD.DIAMOND.powerDur)*100)+'%';
+  }
+  if(fruitBoostEnd){
+    if(now>=fruitBoostEnd){ fruitBoostEnd=0; setGC('boost',false); boostBar.classList.add('hidden'); recalcMs(); }
+    else boostFill.style.width=((fruitBoostEnd-now)/FOOD.FRUIT.boostDur*100)+'%';
+  }
+  if(magnetEnd){
+    if(now>=magnetEnd){ magnetEnd=0; setGC('magnet-glow',false); magnetBar.classList.add('hidden'); }
+    else magnetFill.style.width=((magnetEnd-now)/PWU.MAGNET.dur*100)+'%';
+  }
+  if(slowMoEnd){
+    if(now>=slowMoEnd){ slowMoEnd=0; setGC('slowmo-glow',false); slowmoBar.classList.add('hidden'); recalcMs(); }
+    else slowmoFill.style.width=((slowMoEnd-now)/PWU.SLOWMO.dur*100)+'%';
+  }
+  if(ghostEnd){
+    if(now>=ghostEnd){ ghostEnd=0; setGC('ghost-glow',false); ghostBar.classList.add('hidden'); }
+    else ghostFill.style.width=((ghostEnd-now)/PWU.GHOST.dur*100)+'%';
+  }
+}
+
+/* ── UI update ── */
 function updateUI(){
   scoreEl.textContent=score;
-  highEl.textContent=high;
+  highEl.textContent=Math.max(score,high);
   lenEl.textContent=snake.length;
   lenBar.style.width=Math.min(100,(snake.length/50)*100)+'%';
+  eatenEl.textContent=totalEaten;
+  bestComboEl.textContent=`×${bestCombo}`;
   const lv=getLevel(score);
-  lvlBadge.textContent=lv.lbl;lvlBadge.className=`badge ${lv.cls}`;
+  lvlBadge.textContent=lv.lbl; lvlBadge.className=`badge ${lv.cls}`;
   spdBar.textContent=`SPEED: ${spdLabel(currentMs)}`;
-  if(combo<=0){comboEl.textContent='—';comboEl.style.color='var(--dim)';}
-  else{
-    comboEl.textContent=`×${combo}`;
-    comboEl.style.color=combo>=3?'#ff9900':combo>=2?'#ffff00':'var(--txt)';
-  }
+  // Mobile bar
+  mScore.textContent=score;
+  mHigh.textContent=Math.max(score,high);
+  mLen.textContent=snake.length;
+  mLvl.textContent=`LVL ${LEVELS.indexOf(lv)+1}`; mLvl.className=`badge ${lv.cls}`;
+  // Combo
+  const mult=getMultiplier();
+  const comboTxt=mult>1?`×${mult}`:'—';
+  const comboColor=mult>=5?'#ff4455':mult>=3?'#ffcc00':mult>=2?'#ff9900':'var(--dim)';
+  comboEl.textContent=comboTxt; comboEl.style.color=comboColor;
+  mCombo.textContent=comboTxt; mCombo.style.color=comboColor;
 }
 
+/* ── Toast ── */
 let toastT;
-function showToast(msg,type='green'){
-  toast.textContent=msg;toast.className=`toast show ${type}`;
-  clearTimeout(toastT);toastT=setTimeout(()=>toast.className='toast',2200);
+function showToast(msg,type=''){
+  toast.textContent=msg;
+  toast.className=`show ${type}`;
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>toast.className='',2200);
 }
 
 function flashFI(id){
   const el=document.getElementById(id);
-  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
   setTimeout(()=>el.classList.remove('flash'),500);
 }
 
 function bpop(x,y,txt,color){
   const el=document.createElement('div');
-  el.className='bpop';el.textContent=txt;el.style.color=color;
-  const cr=gc.getBoundingClientRect(),pr=gc.parentElement.getBoundingClientRect();
-  el.style.left=(cr.left-pr.left+x)+'px';
-  el.style.top=(cr.top-pr.top+y)+'px';
-  gc.parentElement.appendChild(el);
+  el.className='bpop'; el.textContent=txt; el.style.color=color;
+  const s=parseFloat(cboxScaler.style.transform?.replace(/scale\(|\)/g,'')||1);
+  el.style.left=(x*s)+'px'; el.style.top=(y*s)+'px';
+  cboxScaler.appendChild(el);
   el.addEventListener('animationend',()=>el.remove());
 }
 
-// ── Render ──
+/* ── Rendering ── */
 function render(ts){
   ctx.clearRect(0,0,W,W);
-  drawGrid();drawFoods();drawSnake();drawParts();tickParts();tickPower();
-  // Remove fruit boost border when boost expires
-  if(Date.now()>=fruitBoostEnd&&gc.classList.contains('fb'))gc.classList.remove('fb');
+  drawGrid(); drawFoods(ts); drawPwuItems(ts); drawSnake(ts); drawParts();
+  tickParts(); tickEffects();
 }
 
 function drawGrid(){
-  ctx.strokeStyle=powerMode?'rgba(0,80,160,.18)':'rgba(20,20,55,.9)';
+  const ghostOn=ghostEnd&&Date.now()<ghostEnd;
+  ctx.strokeStyle=powerMode?'rgba(0,80,160,.16)':ghostOn?'rgba(80,0,120,.15)':'rgba(18,18,50,.9)';
   ctx.lineWidth=.5;
   for(let i=0;i<=GRID;i++){
-    ctx.beginPath();ctx.moveTo(i*CELL,0);ctx.lineTo(i*CELL,W);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,i*CELL);ctx.lineTo(W,i*CELL);ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,W); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(W,i*CELL); ctx.stroke();
   }
 }
 
-function drawFoods(){
+function drawFoods(ts){
   foods.forEach(f=>{
-    f.pulse=(f.pulse||0)+.055;
-    const sc=1+.09*Math.sin(f.pulse),gl=9+6*Math.sin(f.pulse);
-    const cx=f.x*CELL+CELL/2,cy=f.y*CELL+CELL/2;
+    f.pulse=(f.pulse||0)+.05;
+    const sc=1+.08*Math.sin(f.pulse), gl=8+5*Math.sin(f.pulse);
+    const cx=f.x*CELL+CELL/2, cy=f.y*CELL+CELL/2;
     ctx.save();
-    ctx.beginPath();ctx.arc(cx,cy,(CELL/2-2)*sc,0,Math.PI*2);
-    ctx.fillStyle=f.type.glow;ctx.shadowColor=f.type.color;ctx.shadowBlur=gl;
-    ctx.fill();ctx.restore();
-    ctx.save();
-    ctx.font=`${Math.floor(CELL*.7*sc)}px serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor=f.type.color;ctx.shadowBlur=gl;
-    ctx.fillText(f.emoji,cx,cy);ctx.restore();
+    ctx.beginPath(); ctx.arc(cx,cy,(CELL/2-2)*sc,0,Math.PI*2);
+    ctx.fillStyle=f.type.glow; ctx.shadowColor=f.type.color; ctx.shadowBlur=gl; ctx.fill();
+    ctx.restore(); ctx.save();
+    ctx.font=`${Math.floor(CELL*.68*sc)}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=f.type.color; ctx.shadowBlur=gl;
+    ctx.fillText(f.emoji,cx,cy); ctx.restore();
+  });
+}
+
+function drawPwuItems(ts){
+  const now=Date.now();
+  pwuItems.forEach(p=>{
+    p.pulse=(p.pulse||0)+.07;
+    const age=now-p.born;
+    const alpha=age>9000?(0.45+0.55*Math.abs(Math.sin(ts/160))):1;
+    const sc=1+.12*Math.sin(p.pulse);
+    const cx=p.x*CELL+CELL/2, cy=p.y*CELL+CELL/2;
+    ctx.save(); ctx.globalAlpha=alpha;
+    // Spinning ring
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(ts/700);
+    ctx.strokeStyle=p.type.color; ctx.shadowColor=p.type.color;
+    ctx.shadowBlur=13+6*Math.sin(p.pulse); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(0,0,(CELL/2+2)*sc,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+    // Emoji
+    ctx.font=`${Math.floor(CELL*.65*sc)}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=p.type.color; ctx.shadowBlur=9;
+    ctx.fillText(p.type.emoji,cx,cy);
+    ctx.restore();
   });
 }
 
 function rRect(x,y,w,h,r){
   ctx.beginPath();
-  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
-  ctx.closePath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
 }
 
-function drawSnake(){
-  const fruitActive=Date.now()<fruitBoostEnd;
+function drawSnake(ts){
+  const now=Date.now();
+  const fruitOn=fruitBoostEnd&&now<fruitBoostEnd;
+  const ghostOn=ghostEnd&&now<ghostEnd;
+  const magnetOn=magnetEnd&&now<magnetEnd;
+
   snake.forEach((s,i)=>{
-    const x=s.x*CELL,y=s.y*CELL,isHead=(i===0);
+    const x=s.x*CELL,y=s.y*CELL,isHead=i===0;
     const t=i/snake.length;
     let fill,sc,bl;
-    if(powerMode){
-      const ra=1-t;
-      fill=`hsl(${195+ra*30},100%,${38+ra*22}%)`;
-      sc='#00bfff';bl=isHead?26:10+(1-t)*8;
-    } else if(fruitActive){
-      fill=`hsl(${18+t*12},100%,${isHead?52:35+(1-t)*14}%)`;
-      sc='#ff6b35';bl=isHead?22:7+(1-t)*7;
+
+    if(ghostOn){
+      fill=`hsla(${270+t*30},80%,${isHead?55:35+(1-t)*14}%,${isHead?0.85:0.6})`;
+      sc='#bf5fff'; bl=isHead?22:7+(1-t)*6;
+    } else if(powerMode){
+      fill=`hsl(${195+(1-t)*28},100%,${38+(1-t)*20}%)`;
+      sc='#00bfff'; bl=isHead?24:9+(1-t)*7;
+    } else if(fruitOn){
+      fill=`hsl(${25+t*12},100%,${isHead?52:34+(1-t)*13}%)`;
+      sc='#ff6b35'; bl=isHead?20:6+(1-t)*5;
+    } else if(magnetOn){
+      fill=`hsl(${45+t*10},95%,${isHead?50:32+(1-t)*12}%)`;
+      sc='#ffcc00'; bl=isHead?18:5+(1-t)*5;
     } else {
-      fill=`hsl(${108+t*28},100%,${isHead?52:32+(1-t)*16}%)`;
-      sc='#39ff14';bl=isHead?22:7+(1-t)*7;
+      fill=`hsl(${108+t*26},100%,${isHead?52:32+(1-t)*15}%)`;
+      sc='#39ff14'; bl=isHead?20:6+(1-t)*6;
     }
+
     const pad=isHead?1:2,rad=isHead?8:5;
     ctx.save();
-    ctx.shadowColor=sc;ctx.shadowBlur=bl;ctx.fillStyle=fill;
-    rRect(x+pad,y+pad,CELL-pad*2,CELL-pad*2,rad);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,.14)';ctx.shadowBlur=0;
-    rRect(x+pad+2,y+pad+2,(CELL-pad*2)*.38,(CELL-pad*2)*.28,3);ctx.fill();
+    ctx.shadowColor=sc; ctx.shadowBlur=bl; ctx.fillStyle=fill;
+    if(ghostOn) ctx.globalAlpha=isHead?.82:.55;
+    rRect(x+pad,y+pad,CELL-pad*2,CELL-pad*2,rad); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.12)'; ctx.shadowBlur=0;
+    if(ghostOn) ctx.globalAlpha=.3;
+    rRect(x+pad+2,y+pad+2,(CELL-pad*2)*.36,(CELL-pad*2)*.26,3); ctx.fill();
     ctx.restore();
-    if(isHead)drawEyes(x,y);
-    // Spawn particles only on head during power (1 per frame max)
-    if(powerMode&&isHead)spawnParts(x,y,'#00bfff',2,true);
+
+    if(isHead) drawEyes(x,y,ghostOn,fruitOn,magnetOn);
+
+    // Selective sparkles (head + first few segments only)
+    if(powerMode&&i<4&&Math.random()<.12) spawnParts(x,y,'#00bfff',1,true);
+    if(ghostOn&&i<3&&Math.random()<.09)  spawnParts(x,y,'#bf5fff',1,false);
+    if(magnetOn&&i<3&&Math.random()<.07) spawnParts(x,y,'#ffcc00',1,false);
+
+    // Shield dashed ring around head
+    if(isHead&&shieldActive){
+      ctx.save();
+      ctx.strokeStyle='#ff4455'; ctx.lineWidth=2;
+      ctx.shadowColor='#ff4455'; ctx.shadowBlur=14+5*Math.sin(ts/200);
+      ctx.setLineDash([4,4]); ctx.lineDashOffset=-ts/55;
+      ctx.beginPath(); ctx.arc(x+CELL/2,y+CELL/2,CELL/2+5,0,Math.PI*2);
+      ctx.stroke(); ctx.restore();
+    }
+    // Magnet radius
+    if(isHead&&magnetOn){
+      ctx.save();
+      ctx.strokeStyle='rgba(255,204,0,.14)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(x+CELL/2,y+CELL/2,3.5*CELL,0,Math.PI*2);
+      ctx.stroke(); ctx.restore();
+    }
   });
 }
 
-function drawEyes(x,y){
-  const fruitActive=Date.now()<fruitBoostEnd;
-  const ec=powerMode?'#00ffff':fruitActive?'#ffdd88':'#ffffff';
+function drawEyes(x,y,ghostOn,fruitOn,magnetOn){
+  const ec=powerMode?'#00ffff':ghostOn?'#fff':fruitOn?'#ffcc00':magnetOn?'#ffee44':'#fff';
   let e1,e2;
-  if(dir.x===1)      {e1={x:x+22,y:y+8};e2={x:x+22,y:y+20};}
-  else if(dir.x===-1){e1={x:x+6,y:y+8};e2={x:x+6,y:y+20};}
-  else if(dir.y===-1){e1={x:x+8,y:y+6};e2={x:x+20,y:y+6};}
-  else               {e1={x:x+8,y:y+22};e2={x:x+20,y:y+22};}
+  if(dir.x===1)       {e1={x:x+22,y:y+8}; e2={x:x+22,y:y+20};}
+  else if(dir.x===-1) {e1={x:x+6, y:y+8}; e2={x:x+6, y:y+20};}
+  else if(dir.y===-1) {e1={x:x+8, y:y+6}; e2={x:x+20,y:y+6};}
+  else                {e1={x:x+8, y:y+22};e2={x:x+20,y:y+22};}
   [e1,e2].forEach(e=>{
-    ctx.beginPath();ctx.arc(e.x,e.y,4,0,Math.PI*2);
-    ctx.fillStyle=ec;ctx.shadowColor=ec;ctx.shadowBlur=powerMode?12:5;ctx.fill();
-    ctx.beginPath();ctx.arc(e.x+1,e.y+1,2,0,Math.PI*2);
-    ctx.fillStyle='#000';ctx.shadowBlur=0;ctx.fill();
+    ctx.beginPath(); ctx.arc(e.x,e.y,4,0,Math.PI*2);
+    ctx.fillStyle=ec; ctx.shadowColor=ec; ctx.shadowBlur=powerMode?12:4; ctx.fill();
+    ctx.beginPath(); ctx.arc(e.x+1,e.y+1,2,0,Math.PI*2);
+    ctx.fillStyle='#000'; ctx.shadowBlur=0; ctx.fill();
   });
 }
 
-// ── Loop ──
+/* ── Game loop ── */
 function loop(ts){
   animF=requestAnimationFrame(loop);
   drawBg(ts);
-  if(running){
-    render(ts);
-    if(ts-lastTick>=currentMs){lastTick=ts;tick();}
-  }
+  if(running){ render(ts); if(ts-lastTick>=currentMs){ lastTick=ts; tick(); } }
 }
 
-// ── Start / End ──
+/* ── Start / End / Pause ── */
 function startGame(){
   initGame();
-  running=true;paused=false;
-  ovStart.classList.add('hidden');
-  ovGO.classList.add('hidden');
-  ovPause.classList.add('hidden');
+  running=true; paused=false;
+  [ovStart,ovGO,ovPause].forEach(o=>o.classList.add('hidden'));
+  updateBtns();
   lastTick=performance.now();
-  if(!animF)requestAnimationFrame(loop);
+  if(!animF) animF=requestAnimationFrame(loop);
 }
 
 function endGame(reason){
-  running=false;SFX.over();
-  if(score>high){high=score;localStorage.setItem('neonSnakeHi',high);newHigh.style.display='block';}
+  running=false; SFX.over();
+  powerMode=false; fruitBoostEnd=0; magnetEnd=0; slowMoEnd=0; ghostEnd=0; shieldActive=false;
+  clearGCAll(); if(wrapMode) setGC('wrap-active',true);
+  [pwrBar,boostBar,shieldBar,magnetBar,slowmoBar,ghostBar].forEach(b=>b.classList.add('hidden'));
+  if(score>high){ high=score; localStorage.setItem('neonSnakeHi',high); newHigh.style.display='block'; }
   else newHigh.style.display='none';
-  finalEl.textContent=score;
-  highEl.textContent=high;
+  finalEl.textContent=score; highEl.textContent=high; mHigh.textContent=high;
   deathEl.textContent=reason||'';
+  goStatsEl.textContent=`Ate ${totalEaten} items · Best combo ×${bestCombo}`;
   ovGO.classList.remove('hidden');
+  updateBtns();
 }
 
-// ── Input ──
+function togglePause(){
+  if(!running) return;
+  paused=!paused;
+  if(paused){ ovPause.classList.remove('hidden'); }
+  else { ovPause.classList.add('hidden'); lastTick=performance.now(); }
+  updateBtns();
+}
+
+function toggleWrap(){
+  wrapMode=!wrapMode;
+  const b=document.getElementById('btnWrap');
+  b.textContent=wrapMode?'🌀 WRAP: ON':'🌀 WRAP: OFF';
+  b.classList.toggle('on',wrapMode);
+  setGC('wrap-active',wrapMode);
+  wrapBar.classList.toggle('hidden',!wrapMode);
+  showToast(wrapMode?'🌀 WRAP ON — walls are portals!':'🌀 WRAP OFF','wrap');
+}
+
+function updateBtns(){
+  if(!running || !ovGO.classList.contains('hidden')){
+    btnPlay.textContent='▶ START';
+  } else if(paused){
+    btnPlay.textContent='▶ RESUME';
+  } else {
+    btnPlay.textContent='⏸ PAUSE';
+  }
+}
+
+/* ── Mobile canvas scaling ── */
+function scaleGame(){
+  const maxW=Math.min(window.innerWidth-14,600);
+  const s=maxW/600;
+  if(s<1){
+    cboxScaler.style.transform=`scale(${s})`;
+    cboxScaler.style.marginBottom=`${(s-1)*600}px`;
+  } else {
+    cboxScaler.style.transform='';
+    cboxScaler.style.marginBottom='';
+  }
+}
+scaleGame();
+
+/* ── Direction queue ── */
+function queueDir(nd){
+  if(!running||paused) return;
+  const last=dirQueue.length?dirQueue[dirQueue.length-1]:dir;
+  if(nd.x===-last.x&&nd.y===-last.y) return;  // no 180°
+  if(nd.x===last.x&&nd.y===last.y) return;     // no same
+  dirQueue.push(nd);
+  if(dirQueue.length>2) dirQueue.shift();
+}
+
+/* ── Keyboard ── */
 const KM={
   ArrowUp:{x:0,y:-1},w:{x:0,y:-1},W:{x:0,y:-1},
   ArrowDown:{x:0,y:1},s:{x:0,y:1},S:{x:0,y:1},
   ArrowLeft:{x:-1,y:0},a:{x:-1,y:0},A:{x:-1,y:0},
   ArrowRight:{x:1,y:0},d:{x:1,y:0},D:{x:1,y:0},
 };
-
 document.addEventListener('keydown',e=>{
   const nd=KM[e.key];
-  if(nd){
+  if(nd){ e.preventDefault(); queueDir(nd); return; }
+  if(e.key==='p'||e.key==='P'){ if(running) togglePause(); }
+  if((e.key==='r'||e.key==='R')&&ovHTP.classList.contains('hidden')) startGame();
+  if(e.key===' '){
     e.preventDefault();
-    if(!running||paused)return;
-    // FIX: compare against ndir (queued), not dir (committed)
-    // Prevents 180-degree reversal when two keys pressed between ticks
-    if(nd.x!==-ndir.x||nd.y!==-ndir.y)ndir=nd;
-  }
-
-  // Enter / Space: universal action key
-  if(e.key==='Enter'||e.key===' '){
-    e.preventDefault();
-    if(!ovStart.classList.contains('hidden')){startGame();return;}
-    if(!ovGO.classList.contains('hidden')){startGame();return;}
-    if(!ovHTP.classList.contains('hidden')){ovHTP.classList.add('hidden');ovStart.classList.remove('hidden');return;}
-    if(running&&paused){paused=false;ovPause.classList.add('hidden');lastTick=performance.now();}
-  }
-
-  if((e.key==='p'||e.key==='P')&&running){
-    paused=!paused;
-    if(paused)ovPause.classList.remove('hidden');
-    else{ovPause.classList.add('hidden');lastTick=performance.now();}
+    if(!ovGO.classList.contains('hidden')||!ovStart.classList.contains('hidden')) startGame();
+    else if(running) togglePause();
   }
 });
 
-document.getElementById('btnStart').addEventListener('click',startGame);
-document.getElementById('btnRestart').addEventListener('click',startGame);
-document.getElementById('btnHow').addEventListener('click',()=>{ovStart.classList.add('hidden');ovHTP.classList.remove('hidden');});
-document.getElementById('btnHTPBack').addEventListener('click',()=>{ovHTP.classList.add('hidden');ovStart.classList.remove('hidden');});
+/* ── Touch swipe on canvas ── */
+let tStart=null;
+gc.addEventListener('touchstart',e=>{ e.preventDefault(); tStart=e.touches[0]; },{passive:false});
+gc.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(!tStart) return;
+  const dx=e.changedTouches[0].clientX-tStart.clientX;
+  const dy=e.changedTouches[0].clientY-tStart.clientY;
+  if(Math.abs(dx)<20&&Math.abs(dy)<20){ tStart=null; return; }
+  if(Math.abs(dx)>Math.abs(dy)) queueDir(dx>0?{x:1,y:0}:{x:-1,y:0});
+  else                          queueDir(dy>0?{x:0,y:1}:{x:0,y:-1});
+  tStart=null;
+},{passive:false});
 
-running=false;
-requestAnimationFrame(loop);
+/* ── D-Pad buttons ── */
+const DMAP=[['dpUp',{x:0,y:-1}],['dpDown',{x:0,y:1}],['dpLeft',{x:-1,y:0}],['dpRight',{x:1,y:0}]];
+DMAP.forEach(([id,d])=>{
+  const el=document.getElementById(id);
+  const act=()=>{ if(!running) startGame(); else queueDir(d); };
+  el.addEventListener('click',act);
+  el.addEventListener('touchstart',ev=>{ ev.preventDefault(); act(); },{passive:false});
+});
+
+/* ── Control bar buttons ── */
+btnPlay.addEventListener('click',()=>{
+  if(!running||!ovGO.classList.contains('hidden')) startGame();
+  else togglePause();
+});
+document.getElementById('btnRestartCtrl').addEventListener('click', startGame);
+document.getElementById('btnWrap').addEventListener('click', toggleWrap);
+document.getElementById('btnHowCtrl').addEventListener('click',()=>{
+  ovStart.classList.add('hidden'); ovGO.classList.add('hidden');
+  ovHTP.classList.remove('hidden');
+});
+
+/* ── Overlay buttons ── */
+document.getElementById('btnStart').addEventListener('click', startGame);
+document.getElementById('btnRestart').addEventListener('click', startGame);
+document.getElementById('btnHowS').addEventListener('click',()=>{
+  ovStart.classList.add('hidden'); ovHTP.classList.remove('hidden');
+});
+document.getElementById('btnHTPBack').addEventListener('click',()=>{
+  ovHTP.classList.add('hidden');
+  if(!running) ovStart.classList.remove('hidden');
+});
+
+/* ── Boot ── */
+running=false; paused=false;
+updateBtns();
+animF=requestAnimationFrame(loop);
 </script>
 </body>
 </html>

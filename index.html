@@ -290,11 +290,109 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
   .ctrl-btn{font-size:.6rem;padding:8px 11px;min-width:76px;}
   .dp-btn{width:64px;height:64px;font-size:1.45rem;}
 }
+
+/* ── Game Over Modal ── */
+#goModal{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(5,5,20,.88);
+  backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:2000;
+}
+#goModal.hidden{display:none;}
+.go-card{
+  background:linear-gradient(135deg,rgba(13,13,42,.98),rgba(8,8,28,.98));
+  border:2px solid var(--red);border-radius:18px;
+  padding:36px 40px 28px;text-align:center;
+  max-width:430px;width:90%;
+  box-shadow:0 0 55px rgba(255,68,85,.4),0 0 110px rgba(255,68,85,.1),
+             inset 0 0 40px rgba(255,68,85,.04);
+  animation:goIn .55s cubic-bezier(.34,1.56,.64,1) forwards;
+  position:relative;overflow:hidden;
+}
+.go-card::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(from 0deg,transparent,rgba(255,68,85,.03),transparent);
+  animation:goRotate 10s linear infinite;pointer-events:none;
+}
+@keyframes goIn{from{opacity:0;transform:scale(.48) translateY(-40px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes goRotate{to{transform:rotate(360deg);}}
+.go-title{
+  font-size:2.7rem;font-weight:900;letter-spacing:7px;
+  color:var(--red);text-shadow:0 0 20px var(--red),0 0 44px rgba(255,68,85,.45);
+  animation:goGlitch 3.5s infinite;margin-bottom:4px;position:relative;z-index:1;
+}
+@keyframes goGlitch{
+  0%,88%,100%{text-shadow:0 0 20px var(--red),0 0 44px rgba(255,68,85,.45);transform:none;}
+  90%{text-shadow:-3px 0 #0ff,3px 0 var(--red);transform:skewX(-7deg);}
+  92%{text-shadow:3px 0 #f0f,-3px 0 var(--red);transform:skewX(4deg);}
+  94%{text-shadow:0 0 20px var(--red);transform:none;}
+}
+.go-sub{font-size:.56rem;letter-spacing:3px;color:var(--dim);margin-bottom:16px;position:relative;z-index:1;}
+.go-score-lbl{font-size:.58rem;letter-spacing:3px;color:var(--dim);text-transform:uppercase;display:block;position:relative;z-index:1;}
+.go-score-num{
+  font-size:4rem;font-weight:900;line-height:1.1;display:block;
+  color:var(--green);text-shadow:0 0 28px var(--green),0 0 56px rgba(57,255,20,.28);
+  animation:scorePopIn .6s .2s cubic-bezier(.34,1.56,.64,1) both;position:relative;z-index:1;
+}
+@keyframes scorePopIn{from{transform:scale(0) rotate(-10deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+.go-newhigh{
+  display:inline-block;margin:8px 0;
+  color:var(--cyan);font-size:.78rem;letter-spacing:3px;font-weight:700;
+  border:1px solid rgba(0,255,255,.4);border-radius:20px;padding:3px 14px;
+  background:rgba(0,255,255,.07);
+  animation:nhPulse 1.2s infinite;position:relative;z-index:1;
+}
+.go-newhigh.hidden{display:none;}
+@keyframes nhPulse{0%,100%{box-shadow:0 0 7px rgba(0,255,255,.28);}50%{box-shadow:0 0 22px rgba(0,255,255,.65);}}
+.go-divider{border:none;border-top:1px solid rgba(255,68,85,.2);margin:14px 0;position:relative;z-index:1;}
+.go-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;position:relative;z-index:1;}
+.go-stat{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:8px;padding:7px 9px;text-align:left;
+}
+.go-stat .sk{display:block;font-size:.48rem;letter-spacing:1px;color:var(--dim);text-transform:uppercase;}
+.go-stat .sv{display:block;font-size:.72rem;color:var(--txt);margin-top:3px;font-weight:600;}
+.go-btn{
+  display:block;width:100%;margin-top:16px;padding:13px;
+  background:transparent;border:2px solid var(--green);color:var(--green);
+  font-family:'Courier New',monospace;font-size:.88rem;letter-spacing:4px;
+  border-radius:8px;cursor:pointer;text-transform:uppercase;
+  animation:goBtnPulse 1.5s infinite,goBtnIn .5s .44s both;
+  touch-action:manipulation;position:relative;z-index:1;
+}
+@keyframes goBtnPulse{0%,100%{box-shadow:0 0 12px rgba(57,255,20,.22);}50%{box-shadow:0 0 30px rgba(57,255,20,.6);}}
+@keyframes goBtnIn{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.go-btn:hover{background:rgba(57,255,20,.09);transform:scale(1.03);}
+.go-hint{font-size:.53rem;color:var(--dim);margin-top:9px;letter-spacing:1px;position:relative;z-index:1;}
+/* ── Mute button ── */
+.ctrl-btn.mute{min-width:90px;}
+.ctrl-btn.mute.off{opacity:.5;}
 </style>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
 <div id="toast"></div>
+
+<!-- ── Game Over Modal ── -->
+<div id="goModal" class="hidden">
+  <div class="go-card">
+    <div class="go-title">GAME OVER</div>
+    <div class="go-sub">NEON SNAKE · CYBERPUNK EDITION</div>
+    <span class="go-score-lbl">FINAL SCORE</span>
+    <span class="go-score-num" id="gmScore">0</span>
+    <div class="go-newhigh hidden" id="gmNewHigh">★ NEW HIGH SCORE! ★</div>
+    <hr class="go-divider">
+    <div class="go-stats">
+      <div class="go-stat"><span class="sk">CAUSE OF DEATH</span><span class="sv" id="gmReason">—</span></div>
+      <div class="go-stat"><span class="sk">ITEMS EATEN</span><span class="sv" id="gmEaten">0</span></div>
+      <div class="go-stat"><span class="sk">BEST COMBO</span><span class="sv" id="gmCombo">×1</span></div>
+      <div class="go-stat"><span class="sk">HIGH SCORE</span><span class="sv" id="gmHighSc">0</span></div>
+    </div>
+    <button class="go-btn" id="gmPlayAgain">↺ PLAY AGAIN</button>
+    <p class="go-hint">Press R · Space · or tap button above</p>
+  </div>
+</div>
 
 <div class="wrap">
   <header>
@@ -446,6 +544,7 @@ header p{color:var(--dim);font-size:.68rem;letter-spacing:4px;margin-top:2px;}
         <button class="ctrl-btn restart" id="btnRestartCtrl">↺ RESTART</button>
         <button class="ctrl-btn wrap" id="btnWrap">🌀 WRAP: OFF</button>
         <button class="ctrl-btn htp"  id="btnHowCtrl">? HOW TO PLAY</button>
+        <button class="ctrl-btn mute" id="btnMute">🔊 MUSIC</button>
       </div>
 
       <!-- ── Mobile D-Pad ── -->
@@ -589,6 +688,14 @@ const goStatsEl  = document.getElementById('goStatsEl');
 const toast      = document.getElementById('toast');
 const cboxScaler = document.getElementById('cboxScaler');
 const btnPlay    = document.getElementById('btnPlay');
+// Game Over Modal
+const goModal   = document.getElementById('goModal');
+const gmScore   = document.getElementById('gmScore');
+const gmNewHigh = document.getElementById('gmNewHigh');
+const gmReason  = document.getElementById('gmReason');
+const gmEaten   = document.getElementById('gmEaten');
+const gmCombo   = document.getElementById('gmCombo');
+const gmHighSc  = document.getElementById('gmHighSc');
 // Mobile
 const mScore = document.getElementById('mScore');
 const mHigh  = document.getElementById('mHigh');
@@ -623,6 +730,61 @@ const SFX={
   ghost(){  [440,370,294,220].forEach((f,i)=>tone(f,'sine',.2,.21,i*.07)); },
   saved(){  [110,220,440,880].forEach((f,i)=>tone(f,'triangle',.12,.27,i*.06)); },
 };
+
+/* ── Ambient Background Music ── */
+let bgMuted=false;
+const BgMusic=(()=>{
+  let masterG=null,blipT=null,ready=false;
+  function init(){
+    if(ready) return; ready=true;
+    const a=ac();
+    masterG=a.createGain(); masterG.gain.value=0; masterG.connect(a.destination);
+    // Bass drone
+    const d=a.createOscillator(); d.type='sine'; d.frequency.value=55;
+    const dg=a.createGain(); dg.gain.value=.52; d.connect(dg); dg.connect(masterG);
+    // LFO on drone pitch
+    const lfo=a.createOscillator(); lfo.type='sine'; lfo.frequency.value=.18;
+    const lg=a.createGain(); lg.gain.value=3; lfo.connect(lg); lg.connect(d.frequency);
+    // Upper pad
+    const p=a.createOscillator(); p.type='triangle'; p.frequency.value=110;
+    const pg=a.createGain(); pg.gain.value=.26; p.connect(pg); pg.connect(masterG);
+    d.start(); p.start(); lfo.start();
+  }
+  function play(){
+    if(bgMuted) return; init();
+    masterG.gain.setTargetAtTime(.062,ac().currentTime,.8);
+    sched();
+  }
+  function pause(){
+    if(!masterG) return;
+    masterG.gain.setTargetAtTime(0,ac().currentTime,.35);
+    clearTimeout(blipT);
+  }
+  function resume(){
+    if(bgMuted||!masterG) return;
+    masterG.gain.setTargetAtTime(.062,ac().currentTime,.45);
+    sched();
+  }
+  function stop(){
+    if(!masterG) return;
+    masterG.gain.setTargetAtTime(0,ac().currentTime,.55);
+    clearTimeout(blipT);
+  }
+  function sched(){
+    clearTimeout(blipT);
+    if(bgMuted) return;
+    blipT=setTimeout(()=>{ if(!bgMuted&&running&&!paused){blip();sched();} },1800+Math.random()*3400);
+  }
+  function blip(){
+    const ns=[55,82,110,165,220,330,440,660,880];
+    const f=ns[Math.floor(Math.random()*ns.length)];
+    const v=.02+Math.random()*.026, dur=.35+Math.random()*.6;
+    tone(f,'sine',dur,v);
+    if(Math.random()<.35) tone(f*2,'sine',dur*.5,v*.4,.07);
+    if(Math.random()<.18) tone(1320+Math.random()*440,'sine',.1,.011,.1);
+  }
+  return{play,pause,resume,stop};
+})();
 
 /* ── Animated background ── */
 let stars=[],bgW=0,bgH=0;
@@ -1155,17 +1317,33 @@ function loop(ts){
 }
 
 /* ── Start / End / Pause ── */
+function showGoModal(reason){
+  gmScore.textContent=score;
+  gmHighSc.textContent=high;
+  gmReason.textContent=reason||'Hit the wall!';
+  gmEaten.textContent=totalEaten;
+  gmCombo.textContent='×'+bestCombo;
+  if(newHigh.style.display!=='none') gmNewHigh.classList.remove('hidden');
+  else gmNewHigh.classList.add('hidden');
+  // Re-trigger card entrance animation
+  const card=goModal.querySelector('.go-card');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='';
+  goModal.classList.remove('hidden');
+}
+
 function startGame(){
   initGame();
   running=true; paused=false;
   [ovStart,ovGO,ovPause].forEach(o=>o.classList.add('hidden'));
+  goModal.classList.add('hidden');
   updateBtns();
   lastTick=performance.now();
   if(!animF) animF=requestAnimationFrame(loop);
+  BgMusic.play();
 }
 
 function endGame(reason){
-  running=false; SFX.over();
+  running=false; SFX.over(); BgMusic.stop();
   powerMode=false; fruitBoostEnd=0; magnetEnd=0; slowMoEnd=0; ghostEnd=0; shieldActive=false;
   clearGCAll(); if(wrapMode) setGC('wrap-active',true);
   [pwrBar,boostBar,shieldBar,magnetBar,slowmoBar,ghostBar].forEach(b=>b.classList.add('hidden'));
@@ -1175,14 +1353,15 @@ function endGame(reason){
   deathEl.textContent=reason||'';
   goStatsEl.textContent=`Ate ${totalEaten} items · Best combo ×${bestCombo}`;
   ovGO.classList.remove('hidden');
+  showGoModal(reason);
   updateBtns();
 }
 
 function togglePause(){
   if(!running) return;
   paused=!paused;
-  if(paused){ ovPause.classList.remove('hidden'); }
-  else { ovPause.classList.add('hidden'); lastTick=performance.now(); }
+  if(paused){ ovPause.classList.remove('hidden'); BgMusic.pause(); }
+  else { ovPause.classList.add('hidden'); lastTick=performance.now(); BgMusic.resume(); }
   updateBtns();
 }
 
@@ -1281,12 +1460,20 @@ document.getElementById('btnRestartCtrl').addEventListener('click', startGame);
 document.getElementById('btnWrap').addEventListener('click', toggleWrap);
 document.getElementById('btnHowCtrl').addEventListener('click',()=>{
   ovStart.classList.add('hidden'); ovGO.classList.add('hidden');
+  goModal.classList.add('hidden');
   ovHTP.classList.remove('hidden');
+});
+document.getElementById('btnMute').addEventListener('click',()=>{
+  bgMuted=!bgMuted;
+  const b=document.getElementById('btnMute');
+  if(bgMuted){ BgMusic.stop(); b.textContent='🔇 MUSIC'; b.classList.add('off'); }
+  else{ if(running&&!paused) BgMusic.resume(); b.textContent='🔊 MUSIC'; b.classList.remove('off'); }
 });
 
 /* ── Overlay buttons ── */
 document.getElementById('btnStart').addEventListener('click', startGame);
 document.getElementById('btnRestart').addEventListener('click', startGame);
+document.getElementById('gmPlayAgain').addEventListener('click', startGame);
 document.getElementById('btnHowS').addEventListener('click',()=>{
   ovStart.classList.add('hidden'); ovHTP.classList.remove('hidden');
 });

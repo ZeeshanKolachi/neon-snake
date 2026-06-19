@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv
+Snake/
+requirements.txt
+pyproject.toml
+main.py
+.python-version
+
+# IDE
+.claude/
+.vscode/

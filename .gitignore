@@ -15,3 +15,9 @@ main.py
 # IDE
 .claude/
 .vscode/
+
+.vercel
+
+node_modules/
+package.json
+package-lock.json

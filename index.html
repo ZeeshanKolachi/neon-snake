@@ -72,15 +72,17 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 
 /* ── GAME SCREEN ── */
 #gameScreen{z-index:5}
-#gameWrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px}
+#gameWrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:8px}
 
 #hudRow{
   display:flex;align-items:center;gap:10px;width:100%;
   font-family:'Share Tech Mono',monospace;
+  background:rgba(0,4,28,.72);border:1px solid #0055bb44;border-radius:7px;
+  padding:8px 14px;backdrop-filter:blur(4px);
 }
 .hud-block{display:flex;flex-direction:column;align-items:center}
-.hud-lbl{font-size:.5rem;letter-spacing:.3em;color:#0077cc}
-.hud-val{font-size:1rem;color:#fff;font-weight:bold}
+.hud-lbl{font-size:.65rem;letter-spacing:.3em;color:#0099ee}
+.hud-val{font-size:1.8rem;color:#fff;font-weight:bold;text-shadow:0 0 12px #00ffff99,0 0 4px #fff}
 #powerBar{
   flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
   font-size:.65rem;min-height:32px;
@@ -94,15 +96,15 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 #puTimerFill{height:100%;border-radius:2px;transition:width .1s linear}
 
 .icon-btn{
-  background:rgba(0,80,200,.12);border:1px solid #0044aa44;border-radius:5px;
-  color:#00aaff;font-size:.9rem;padding:6px 10px;cursor:pointer;transition:all .2s;
+  background:rgba(0,80,200,.15);border:1px solid #0055cc55;border-radius:5px;
+  color:#00ccff;font-size:1.1rem;padding:7px 13px;cursor:pointer;transition:all .2s;
   font-family:inherit;
 }
 .icon-btn:hover{background:rgba(0,200,255,.2);color:#00ffff}
 
 #canvasWrap{position:relative}
-#gameCanvas{display:block;border:1px solid #0044aa33;border-radius:4px;
-  box-shadow:0 0 40px #0022aa22}
+#gameCanvas{display:block;border:1px solid #0055cc55;border-radius:6px;
+  box-shadow:0 0 60px #0033cc33,0 0 120px #001166,inset 0 0 30px rgba(0,10,40,.8)}
 
 #pauseOverlay{
   position:absolute;inset:0;border-radius:4px;
@@ -141,7 +143,7 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 .dblank{width:58px;height:58px}
 
 /* ── GAME OVER SCREEN ── */
-#goScreen{z-index:10;background:rgba(0,0,8,.96)}
+#goScreen{z-index:10;background:rgba(0,0,12,.72)}
 .go-card{
   display:flex;flex-direction:column;align-items:center;gap:18px;
   padding:28px 24px;max-width:420px;width:92%;
@@ -480,7 +482,7 @@ const gameStars = Array.from({length:120},()=>({
 }));
 
 function scaleCanvas() {
-  const maxW=Math.min(innerWidth-16,720), maxH=Math.min(innerHeight-190,540);
+  const maxW=Math.min(innerWidth-20,960), maxH=Math.min(innerHeight-140,680);
   const sc=Math.min(maxW/CW,maxH/CH);
   cv.style.width=Math.round(CW*sc)+'px'; cv.style.height=Math.round(CH*sc)+'px';
 }
@@ -528,7 +530,7 @@ function getMs(){
 
 function initGame(){
   const sx=Math.floor(COLS/2), sy=Math.floor(ROWS/2);
-  snake=[{x:sx,y:sy},{x:sx-1,y:sy},{x:sx-2,y:sy}];
+  snake=[{x:sx,y:sy},{x:sx-1,y:sy},{x:sx-2,y:sy},{x:sx-3,y:sy},{x:sx-4,y:sy}];
   dir={...DIR.RIGHT}; dirQ=[];
   score=0; multiplier=1; shieldOn=false; activePU=null; puTimer=0;
   powerUpObj=null;
@@ -635,21 +637,29 @@ function lerp(a,b,t){return a+(b-a)*t}
 
 function drawStarfield(t){
   const rg=cx.createRadialGradient(CW/2,CH/2,0,CW/2,CH/2,Math.max(CW,CH)*.7);
-  rg.addColorStop(0,'#090920'); rg.addColorStop(1,'#000000');
+  rg.addColorStop(0,'#0b0b24'); rg.addColorStop(1,'#020208');
   cx.fillStyle=rg; cx.fillRect(0,0,CW,CH);
-  [[0,0,'#14004422'],[CW,0,'#00123322'],[0,CH,'#0a002222'],[CW,CH,'#180022']].forEach(([nx,ny,nc])=>{
-    const ng=cx.createRadialGradient(nx,ny,0,nx,ny,CW*.55);
+  // Corner nebulae — more vivid
+  [[0,0,'#1a006688'],[CW,0,'#001a5566'],[0,CH,'#0d006655'],[CW,CH,'#200033aa']].forEach(([nx,ny,nc])=>{
+    const ng=cx.createRadialGradient(nx,ny,0,nx,ny,CW*.65);
     ng.addColorStop(0,nc); ng.addColorStop(1,'transparent');
     cx.fillStyle=ng; cx.fillRect(0,0,CW,CH);
   });
+  // Central soft glow
+  const cg=cx.createRadialGradient(CW/2,CH/2,0,CW/2,CH/2,CW*.4);
+  cg.addColorStop(0,'#05052233'); cg.addColorStop(1,'transparent');
+  cx.fillStyle=cg; cx.fillRect(0,0,CW,CH);
   gameStars.forEach(s=>{
-    cx.globalAlpha=s.base+Math.sin(t*s.spd+s.phase)*.25;
-    cx.fillStyle='#b0ccff';
+    const a=Math.min(1,(s.base+Math.sin(t*s.spd+s.phase)*.3)*1.6);
+    cx.globalAlpha=a;
+    if(a>0.6){cx.shadowBlur=4;cx.shadowColor='#aaccff'}
+    cx.fillStyle='#c8ddff';
     cx.beginPath(); cx.arc(s.x,s.y,s.r,0,Math.PI*2); cx.fill();
+    cx.shadowBlur=0;
   });
   cx.globalAlpha=1;
   // Grid
-  cx.strokeStyle='#0033aa0a'; cx.lineWidth=.5;
+  cx.strokeStyle='#0044cc12'; cx.lineWidth=.5;
   for(let x=0;x<=CW;x+=CELL){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke()}
   for(let y=0;y<=CH;y+=CELL){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke()}
 }
@@ -676,7 +686,7 @@ function drawSnake(t){
     }
 
     cx.save();
-    cx.shadowBlur=i===0?(shieldOn?22:16):7*pct;
+    cx.shadowBlur=i===0?(shieldOn?32:26):10*pct;
     cx.shadowColor=i===0?(shieldOn?'#00ff88':'#00ffff'):col;
     cx.fillStyle=col;
     cx.beginPath(); cx.arc(scx,scy,rad,0,Math.PI*2); cx.fill();
@@ -709,8 +719,8 @@ function drawSnake(t){
 function drawFood(t){
   const {x,y,col,hi,ring}=food;
   const scx=x*CELL+CELL/2, scy=y*CELL+CELL/2+Math.sin(t*2)*2;
-  const r=CELL*.38;
-  cx.save(); cx.shadowBlur=18; cx.shadowColor=col;
+  const r=CELL*.44;
+  cx.save(); cx.shadowBlur=28; cx.shadowColor=col;
   if(ring){
     cx.save(); cx.translate(scx,scy); cx.rotate(Math.sin(t*.35)*.3); cx.scale(1,.28);
     cx.strokeStyle=hi+'99'; cx.lineWidth=2.5; cx.shadowBlur=8; cx.shadowColor=hi;

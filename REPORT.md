@@ -4,7 +4,7 @@
 
 ### Panaversity AI-101 · Assignment 2 · Development Report
 
-[![Version](https://img.shields.io/badge/version-v4.2-00ffff?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/ZeeshanKolachi/neon-snake)
+[![Version](https://img.shields.io/badge/version-v1.4.3-00ffff?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/ZeeshanKolachi/neon-snake)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://neon-snake-pi-ten.vercel.app/play.html)
 [![Built With AI](https://img.shields.io/badge/Built%20with-Claude%20Sonnet%204.6-7c3aed?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.ai)
 
@@ -54,7 +54,7 @@ start index.html   # Windows — no build step required
 
 > A fully AI-built Snake game with space theme, procedural music, 4 power-ups, 3 difficulty levels, persistent leaderboard, and Math Challenge Mode.
 
-**Final Version:** v4.2 &nbsp;|&nbsp; **Stack:** Vanilla JS + Canvas 2D + Web Audio API &nbsp;|&nbsp; **Size:** ~46 KB
+**Final Version:** v1.4.3 &nbsp;|&nbsp; **Stack:** Vanilla JS + Canvas 2D + Web Audio API &nbsp;|&nbsp; **Size:** ~46 KB
 
 ---
 
@@ -168,7 +168,7 @@ Fixed: Shield HUD bar stuck at 100%, self-collision regression, Retry skipping s
 </details>
 
 <details>
-<summary><strong>Iteration 9 — Math Mode + How to Play (v4.2)</strong></summary>
+<summary><strong>Iteration 9 — Math Mode + How to Play (v1.4.1)</strong></summary>
 
 Requested: Optional Math Challenge Mode toggle — question in HUD bar, answer on planet, toast confirms equation. How to Play modal accessible from start screen and HUD.
 
@@ -271,14 +271,14 @@ Spawn every 13–21s. Vanish after 9s uncollected. Orbital dot + shrinking timer
 - **Ambient:** 3 LFO drones (55/82/110 Hz) + Am chord pad — pure Web Audio, zero files
 - **SFX:** eat (frequency sweep) · power-up (arpeggio) · expire (descending) · game over (sawtooth)
 
-### 📐 Math Challenge Mode *(v4.2)*
+### 📐 Math Challenge Mode *(v1.4.1)*
 - Toggle on start screen (zero impact when off)
 - Green HUD bar: `SOLVE ▸ 7 × 8 = ?`
 - Answer shown as text on planet surface
 - Toast confirms equation on eat: `✓ 7 × 8 = 56`
 - Scaled: addition (Easy) · multiplication (Medium/Hard)
 
-### ❓ How to Play *(v4.2)*
+### ❓ How to Play *(v1.4.2)*
 - `❓ HOW TO PLAY` on start screen · `❓` in HUD auto-pauses
 - Sections: Objective, Controls, Scoring, Power-ups, Math Mode, Pro Tips
 
@@ -391,15 +391,16 @@ The Math Challenge Mode turns the game into a **gamified math facts drill**. Eac
 
 | Version | Commit | Highlights |
 |---|---|---|
-| **v4.2** | `38a7f2f` | Math Challenge Mode, How to Play modal, Shield fix, self-collision removed |
-| **v4.1** | `a62aba8` | Visual polish — brighter starfield, stronger glow, frosted HUD |
-| **v4.0** | `825bee6` | Complete Space Edition rebuild — planet food, comet snake, leaderboard |
-| **v3.2** | `1dd91dc` | Procedural ambient music, animated Game Over modal |
-| **v3.1** | `1f73e2f` | Remove self-collision, rework Ghost as wall-immunity |
-| **v3.0** | `de3a37a` | 10 new features — 4 power-ups, mobile D-pad, x5 combo |
-| **v2.1** | `8ef12b0` | Critical bug fixes — direction queue, particle cap, fruit boost |
-| **v2.0** | `50c216e` | 8 gameplay bugs fixed |
-| **v1.0** | `7f73f31` | Initial Neon Snake Cyberpunk Edition |
+| **v1.4.3** ✅ Final | `fe73a3f` | REPORT.md, README.md, gameplay video, all corrections, final submission |
+| **v1.4.2** | `38a7f2f` | Name & assignment corrections, How to Play modal, play.html guide |
+| **v1.4.1** | `53f5183` | Math Challenge Mode, Shield fix, self-collision removed, screenshots |
+| **v1.4.0** | `a62aba8` | Visual polish — brighter starfield, stronger glow, frosted HUD |
+| **v1.3.0** | `825bee6` | Complete Space Edition rebuild — planet food, comet snake, leaderboard |
+| **v1.2.2** | `1dd91dc` | Procedural ambient music, animated Game Over modal |
+| **v1.2.1** | `1f73e2f` | Remove self-collision, rework Ghost as wall-immunity |
+| **v1.2.0** | `de3a37a` | 10 new features — 4 power-ups, mobile D-pad, x5 combo |
+| **v1.1.0** | `8ef12b0` | Critical bug fixes — direction queue, particle cap, fruit boost |
+| **v1.0.0** | `7f73f31` | Initial Neon Snake Cyberpunk Edition |
 
 ---
 

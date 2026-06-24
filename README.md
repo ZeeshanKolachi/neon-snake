@@ -4,7 +4,7 @@
 
 **Panaversity AI-101 · Assignment 2 · Final Submission**
 
-[![Version](https://img.shields.io/badge/version-v4.2-00ffff?style=flat-square)](https://github.com/ZeeshanKolachi/neon-snake)
+[![Version](https://img.shields.io/badge/version-v1.4.3-00ffff?style=flat-square)](https://github.com/ZeeshanKolachi/neon-snake)
 [![Live](https://img.shields.io/badge/Live-Vercel-000?style=flat-square&logo=vercel)](https://neon-snake-pi-ten.vercel.app/play.html)
 [![Built with AI](https://img.shields.io/badge/Built%20with-Claude%20Sonnet%204.6-7c3aed?style=flat-square)](https://claude.ai)
 

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SnakeAI – Play Now</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:#000;color:#fff;
+  font-family:'Orbitron',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ── ANIMATED BACKGROUND ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%,#0d004488 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%,#00114488 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,#04041888 0%,transparent 70%),
+    #000;
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%,#ffffff88,transparent),
+    radial-gradient(1px 1px at 25% 35%,#aaddff66,transparent),
+    radial-gradient(1.5px 1.5px at 40% 10%,#ffffff55,transparent),
+    radial-gradient(1px 1px at 55% 55%,#ffffff44,transparent),
+    radial-gradient(2px 2px at 70% 20%,#ccddff88,transparent),
+    radial-gradient(1px 1px at 85% 70%,#ffffff55,transparent),
+    radial-gradient(1px 1px at 15% 75%,#aaddff44,transparent),
+    radial-gradient(1.5px 1.5px at 90% 40%,#ffffff66,transparent),
+    radial-gradient(1px 1px at 33% 85%,#ffffff33,transparent),
+    radial-gradient(2px 2px at 60% 90%,#aaddff55,transparent),
+    radial-gradient(1px 1px at 5% 50%,#ffffff44,transparent),
+    radial-gradient(1px 1px at 75% 5%,#ccddff66,transparent),
+    radial-gradient(1.5px 1.5px at 45% 65%,#ffffff55,transparent),
+    radial-gradient(1px 1px at 95% 85%,#ffffff44,transparent),
+    radial-gradient(1px 1px at 18% 45%,#aaddff33,transparent);
+  animation:twinkle 4s ease-in-out infinite alternate;
+}
+@keyframes twinkle{
+  0%{opacity:.6}
+  50%{opacity:1}
+  100%{opacity:.7}
+}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;min-height:100vh}
+
+/* ── HERO HEADER ── */
+.hero{
+  width:100%;text-align:center;padding:48px 20px 32px;
+  border-bottom:1px solid #0044aa22;
+  background:linear-gradient(to bottom,rgba(0,0,30,.8),transparent);
+}
+.hero-badge{
+  display:inline-block;font-size:.6rem;letter-spacing:.5em;color:#0088ff;
+  border:1px solid #0044aa88;border-radius:30px;padding:5px 18px;margin-bottom:18px;
+  background:rgba(0,30,100,.3);
+}
+.hero-title{
+  font-size:clamp(3rem,10vw,7rem);font-weight:900;letter-spacing:.05em;
+  background:linear-gradient(135deg,#00ffff 0%,#0088ff 40%,#aa00ff 80%,#ff00aa 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 40px #00ccff66);
+  animation:titleGlow 3s ease-in-out infinite;line-height:1;
+}
+@keyframes titleGlow{
+  0%,100%{filter:drop-shadow(0 0 30px #00ccff55)}
+  50%{filter:drop-shadow(0 0 60px #00ccffaa)}
+}
+.hero-sub{
+  font-size:clamp(.7rem,2vw,1rem);letter-spacing:.5em;color:#0088ff;
+  margin-top:10px;opacity:.85;
+}
+.hero-desc{
+  max-width:600px;margin:20px auto 0;
+  font-family:'Share Tech Mono',monospace;font-size:.85rem;line-height:1.7;
+  color:#8899cc;letter-spacing:.03em;
+}
+
+/* ── STATS ROW ── */
+.stats{
+  display:flex;gap:0;margin:0;width:100%;max-width:800px;
+  border:1px solid #0044aa33;border-radius:10px;overflow:hidden;
+  margin-top:32px;
+}
+.stat{
+  flex:1;text-align:center;padding:18px 10px;
+  border-right:1px solid #0044aa33;
+  background:rgba(0,10,40,.5);
+}
+.stat:last-child{border-right:none}
+.stat-val{font-size:1.8rem;font-weight:900;color:#00ffff;text-shadow:0 0 12px #00ffff88}
+.stat-lbl{font-size:.55rem;letter-spacing:.3em;color:#0066aa;margin-top:4px;font-family:'Share Tech Mono',monospace}
+
+/* ── GAME FRAME SECTION ── */
+.play-section{
+  width:100%;max-width:1100px;padding:40px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.section-label{
+  font-size:.6rem;letter-spacing:.5em;color:#0077cc;
+  display:flex;align-items:center;gap:12px;
+}
+.section-label::before,.section-label::after{
+  content:'';display:block;width:60px;height:1px;background:linear-gradient(to right,transparent,#0044aa88);
+}
+.section-label::after{transform:scaleX(-1)}
+
+.frame-wrap{
+  width:100%;border-radius:12px;overflow:hidden;
+  border:1px solid #0055cc55;
+  box-shadow:0 0 80px #0033aa33,0 0 200px #001166,0 2px 0 #0066ff44 inset;
+  background:#000;
+  position:relative;
+}
+.frame-wrap::before{
+  content:'';position:absolute;inset:-1px;border-radius:12px;z-index:-1;
+  background:linear-gradient(135deg,#00ffff44,#0033ff44,#aa00ff44,#00ffff44);
+  animation:borderSpin 4s linear infinite;
+}
+@keyframes borderSpin{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+
+#gameFrame{
+  display:block;width:100%;border:none;
+  height:min(90vh,740px);
+  background:#000;
+}
+
+/* ── CONTROLS GRID ── */
+.info-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;
+  width:100%;max-width:1100px;padding:0 16px 16px;
+}
+.info-card{
+  border:1px solid #0044aa33;border-radius:10px;padding:20px;
+  background:rgba(0,6,28,.6);
+  transition:border-color .3s,box-shadow .3s;
+}
+.info-card:hover{border-color:#0077cc88;box-shadow:0 0 20px #0033aa22}
+.card-icon{font-size:1.8rem;margin-bottom:10px}
+.card-title{font-size:.7rem;letter-spacing:.3em;color:#0099ff;margin-bottom:8px}
+.card-body{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:#6688aa;line-height:1.8}
+.card-body span{color:#00ccff}
+
+/* ── POWER-UPS TABLE ── */
+.pu-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:0;
+}
+.pu-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(0,0,20,.5);border-radius:6px;padding:8px 10px;
+  border:1px solid rgba(255,255,255,.05);
+}
+.pu-icon{font-size:1.2rem;width:28px;text-align:center}
+.pu-info{display:flex;flex-direction:column;gap:2px}
+.pu-name{font-size:.62rem;letter-spacing:.1em;color:#fff;font-family:'Share Tech Mono',monospace}
+.pu-desc{font-size:.55rem;color:#556677;font-family:'Share Tech Mono',monospace}
+
+/* ── FOOTER ── */
+.footer{
+  width:100%;text-align:center;padding:28px 20px 36px;
+  border-top:1px solid #0044aa22;margin-top:20px;
+  background:rgba(0,0,20,.4);
+}
+.footer-title{font-size:.6rem;letter-spacing:.4em;color:#0055aa;margin-bottom:14px}
+.footer-links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.f-link{
+  display:flex;align-items:center;gap:8px;
+  border:1px solid #0044aa55;border-radius:6px;padding:9px 18px;
+  color:#0088ff;font-size:.7rem;letter-spacing:.1em;text-decoration:none;
+  background:rgba(0,20,80,.3);transition:all .25s;
+  font-family:'Share Tech Mono',monospace;
+}
+.f-link:hover{border-color:#00ffff99;color:#00ffff;box-shadow:0 0 16px #0044aa44;background:rgba(0,40,120,.3)}
+.f-icon{font-size:1rem}
+
+.credit{
+  margin-top:20px;font-family:'Share Tech Mono',monospace;
+  font-size:.6rem;color:#223344;letter-spacing:.2em;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">✦ AI-ASSISTED DEVELOPMENT ✦</div>
+    <div class="hero-title">SnakeAI</div>
+    <div class="hero-sub">✦ SPACE EDITION ✦</div>
+    <p class="hero-desc">
+      A fully AI-built Snake game featuring space exploration mechanics,
+      ambient music, 4 power-ups, 3 difficulty levels, and a global
+      leaderboard. Built for Panaversity AI-101 Assignment 3.
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val">4</div>
+        <div class="stat-lbl">POWER-UPS</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">3</div>
+        <div class="stat-lbl">DIFFICULTY LEVELS</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">∞</div>
+        <div class="stat-lbl">REPLAYABILITY</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">🏆</div>
+        <div class="stat-lbl">LEADERBOARD</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="play-section">
+    <div class="section-label">PLAY NOW</div>
+    <div class="frame-wrap">
+      <iframe id="gameFrame" src="index.html" title="SnakeAI Space Edition" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- INFO CARDS -->
+  <div class="info-grid">
+
+    <div class="info-card">
+      <div class="card-icon">🎮</div>
+      <div class="card-title">CONTROLS</div>
+      <div class="card-body">
+        <span>Arrow Keys</span> or <span>WASD</span> — move<br>
+        <span>P</span> / <span>Space</span> / <span>Esc</span> — pause<br>
+        <span>🔊</span> — toggle music & SFX<br>
+        <span>Swipe</span> — on mobile devices<br>
+        <span>D-Pad</span> — on-screen for touch
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">POWER-UPS</div>
+      <div class="pu-grid">
+        <div class="pu-item">
+          <div class="pu-icon">⚡</div>
+          <div class="pu-info">
+            <div class="pu-name">SPEED BOOST</div>
+            <div class="pu-desc">Snake moves faster</div>
+          </div>
+        </div>
+        <div class="pu-item">
+          <div class="pu-icon">❄</div>
+          <div class="pu-info">
+            <div class="pu-name">SLOW MOTION</div>
+            <div class="pu-desc">More reaction time</div>
+          </div>
+        </div>
+        <div class="pu-item">
+          <div class="pu-icon">✦</div>
+          <div class="pu-info">
+            <div class="pu-name">2× SCORE</div>
+            <div class="pu-desc">Double points</div>
+          </div>
+        </div>
+        <div class="pu-item">
+          <div class="pu-icon">◈</div>
+          <div class="pu-info">
+            <div class="pu-name">WALL SHIELD</div>
+            <div class="pu-desc">Pass through once</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-icon">🚀</div>
+      <div class="card-title">DIFFICULTY</div>
+      <div class="card-body">
+        <span>EASY</span> — slower speed, 1× score<br>
+        <span>MEDIUM</span> — standard, 1.5× score<br>
+        <span>HARD</span> — fast speed, 2× score<br><br>
+        Higher difficulty = bigger scores.
+        Power-ups appear every 13–21 seconds
+        and vanish if uncollected for 9 seconds.
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-icon">🌌</div>
+      <div class="card-title">BUILT WITH AI</div>
+      <div class="card-body">
+        <span>Claude Sonnet 4.6</span> — game engine<br>
+        <span>Web Audio API</span> — procedural music<br>
+        <span>Canvas 2D</span> — rendering<br>
+        <span>localStorage</span> — leaderboard<br><br>
+        Zero external dependencies. Single
+        HTML file. Works offline.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-title">▸ PROJECT LINKS ◂</div>
+    <div class="footer-links">
+      <a class="f-link" href="index.html" target="_blank">
+        <span class="f-icon">🎮</span> PLAY FULLSCREEN
+      </a>
+      <a class="f-link" href="https://github.com/ZeeshanKolachi/neon-snake" target="_blank">
+        <span class="f-icon">⌨</span> GITHUB
+      </a>
+    </div>
+    <div class="credit">PANAVERSITY AI-101 · ASSIGNMENT 3 · BUILT WITH CLAUDE AI</div>
+  </footer>
+
+</div>
+</body>
+</html>

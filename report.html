@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Assignment 3 Report — SnakeAI Space Edition</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+  :root {
+    --accent: #0066cc;
+    --accent-light: #e8f0fb;
+    --border: #d0d7de;
+    --text: #1a1a2e;
+    --muted: #57606a;
+    --bg: #ffffff;
+    --code-bg: #f6f8fa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    text-align: center;
+    padding: 48px 0 40px;
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: 40px;
+  }
+  .cover-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid #c0d6f5;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .cover .sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  .meta-item {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 10px;
+    font-size: 12px;
+  }
+  .meta-item .label { color: var(--muted); margin-bottom: 3px; }
+  .meta-item .value { font-weight: 600; color: var(--text); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  .toc h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 12px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 44px; }
+  .section-num {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+  }
+  h3 { font-size: 14px; font-weight: 600; margin: 20px 0 8px; color: var(--text); }
+  p { margin-bottom: 12px; color: #2d2d44; }
+
+  /* ── VERSION TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 13px; }
+  th { background: var(--accent); color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--code-bg); }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0 20px;
+    font-family: 'Fira Code', monospace;
+    font-size: 12.5px;
+    color: #e6edf3;
+    line-height: 1.65;
+    white-space: pre-wrap;
+  }
+  .prompt-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ── LISTS ── */
+  ul, ol { padding-left: 20px; margin-bottom: 14px; }
+  li { margin-bottom: 5px; color: #2d2d44; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-light);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  .callout.green { border-color: #22c55e; background: #f0fdf4; }
+  .callout.orange { border-color: #f97316; background: #fff7ed; }
+  .callout.red { border-color: #ef4444; background: #fef2f2; }
+
+  /* ── FEATURE CHIPS ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 16px; }
+  .chip {
+    background: var(--accent-light);
+    border: 1px solid #c0d6f5;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  /* ── LINKS ── */
+  .link-row {
+    display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;
+  }
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .link-btn.ghost {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { padding: 20px; font-size: 12px; }
+    .cover { page-break-after: always; }
+    h2 { page-break-before: auto; }
+    .prompt-box { font-size: 11px; }
+    .link-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Panaversity · AI-101 · Assignment 3</div>
+  <h1>SnakeAI — Space Edition</h1>
+  <p class="sub">AI-Assisted Game Development Report</p>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="label">Student</div>
+      <div class="value">Zeeshan Ahmed</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Date</div>
+      <div class="value">June 24, 2026</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Version</div>
+      <div class="value">v4.1 + Math Mode</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">AI Tool Used</div>
+      <div class="value">Claude Sonnet 4.6</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Technology</div>
+      <div class="value">HTML / JS / Canvas</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Platform</div>
+      <div class="value">Browser (any device)</div>
+    </div>
+  </div>
+
+  <div class="link-row" style="justify-content:center; margin-top:24px">
+    <a class="link-btn" href="https://neon-snake-gules.vercel.app/play.html" target="_blank">🎮 Live Game</a>
+    <a class="link-btn ghost" href="https://github.com/ZeeshanKolachi/neon-snake" target="_blank">⌨ GitHub Repo</a>
+  </div>
+</div>
+
+<!-- ══ TABLE OF CONTENTS ══════════════════════════════════════ -->
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Project Title</a></li>
+    <li><a href="#s2">App / Game Idea</a></li>
+    <li><a href="#s3">Purpose of the Project</a></li>
+    <li><a href="#s4">AI Tools Used</a></li>
+    <li><a href="#s5">Initial Prompt</a></li>
+    <li><a href="#s6">Prompt Iterations During Development</a></li>
+    <li><a href="#s7">What Worked Well</a></li>
+    <li><a href="#s8">What Did Not Work</a></li>
+    <li><a href="#s9">Bugs and Challenges Faced</a></li>
+    <li><a href="#s10">How Issues Were Solved</a></li>
+    <li><a href="#s11">Features Added or Improved</a></li>
+    <li><a href="#s12">Final Result</a></li>
+    <li><a href="#s13">Real-World Problem Solved</a></li>
+  </ol>
+</div>
+
+<!-- ══ 1. PROJECT TITLE ═══════════════════════════════════════ -->
+<div class="section" id="s1">
+  <h2><span class="section-num">1</span>Project Title</h2>
+  <p><strong>SnakeAI — Space Edition</strong><br>
+  A fully browser-based Snake game built entirely using AI assistance, featuring a Space Galaxy theme, Math Challenge Mode, procedural audio, 4 power-ups, 3 difficulty levels, and a persistent leaderboard.</p>
+</div>
+
+<!-- ══ 2. IDEA ════════════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <h2><span class="section-num">2</span>App / Game Idea</h2>
+  <p>The project is a modern reimagining of the classic Snake game, redesigned with a space exploration theme. The player controls a snake-like spacecraft moving across a starfield canvas, collecting glowing planets as food while avoiding walls. The game escalates in difficulty and introduces power-ups that change speed, multiply score, or protect against wall collisions.</p>
+  <p>A unique addition — the <strong>Math Challenge Mode</strong> — overlays math questions onto the game, turning each food collection into a learning moment. The food planet displays the correct answer to an arithmetic question shown in the HUD. This transforms a casual game into an educational tool.</p>
+  <div class="chips">
+    <span class="chip">Classic Snake Mechanics</span>
+    <span class="chip">Space / Galaxy Theme</span>
+    <span class="chip">4 Power-Ups</span>
+    <span class="chip">Math Challenge Mode</span>
+    <span class="chip">Leaderboard</span>
+    <span class="chip">Procedural Music</span>
+    <span class="chip">Mobile Support</span>
+  </div>
+</div>
+
+<!-- ══ 3. PURPOSE ═════════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <h2><span class="section-num">3</span>Purpose of the Project</h2>
+  <p>The primary purpose was to demonstrate AI-assisted development by building a fully functional, polished game from scratch using only natural language prompts to an AI coding assistant. The project aimed to:</p>
+  <ul>
+    <li>Practice prompt engineering through multiple iterations</li>
+    <li>Learn how AI tools can accelerate game development</li>
+    <li>Explore the capabilities of Canvas 2D, Web Audio API, and localStorage in a browser environment</li>
+    <li>Build something visually engaging and genuinely replayable</li>
+    <li>Demonstrate real-world educational value through the Math Challenge Mode</li>
+  </ul>
+  <div class="callout">
+    The game was entirely contained in a single <code>index.html</code> file with zero external dependencies beyond Google Fonts — proving that a polished browser game can be shipped without a build system or framework.
+  </div>
+</div>
+
+<!-- ══ 4. AI TOOLS ════════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <h2><span class="section-num">4</span>AI Tools Used</h2>
+  <table>
+    <tr><th>Tool</th><th>Model</th><th>Role</th></tr>
+    <tr><td><strong>Claude Code (Anthropic)</strong></td><td>Claude Sonnet 4.6</td><td>Primary development tool — all code generation, bug fixing, feature additions, and code review were handled through conversation-driven prompts in Claude Code CLI</td></tr>
+    <tr><td><strong>GitHub Copilot</strong></td><td>—</td><td>Occasional inline suggestions during editing sessions</td></tr>
+  </table>
+  <p>All major design decisions, architecture choices, and feature implementations were driven through natural language prompts to <strong>Claude Sonnet 4.6</strong> via the Claude Code CLI. The AI co-authored every commit, as reflected in the <code>Co-Authored-By</code> lines in the git history.</p>
+</div>
+
+<!-- ══ 5. INITIAL PROMPT ══════════════════════════════════════ -->
+<div class="section" id="s5">
+  <h2><span class="section-num">5</span>Initial Prompt</h2>
+  <p>The first version of the game was created with the following prompt:</p>
+  <div class="prompt-label">Prompt v1 — Initial Game Creation</div>
+  <div class="prompt-box">Build me a complete Snake game in a single HTML file using vanilla JavaScript and Canvas 2D.
+
+Theme: Neon Cyberpunk. Dark background with neon green snake.
+
+Features to include:
+- Three types of food: vegetables (+5 pts), fruits (+15 pts), diamonds (+50 pts)
+- Diamond power mode: snake turns electric blue and glows for 5 seconds
+- 5 speed levels (1–5), selectable before game starts
+- Combo multiplier: eating 3+ foods in quick succession multiplies score
+- Animated starfield background
+- Web Audio API sound effects (eat, power-up, game over)
+- High score stored in localStorage
+- Controls: Arrow keys and WASD
+- No external dependencies except Google Fonts</div>
+  <p>This produced the first working version — a Cyberpunk-themed Snake with 3 food types, combo multiplier, and sound effects committed as <em>"Neon Snake Cyberpunk Edition"</em>.</p>
+</div>
+
+<!-- ══ 6. PROMPT ITERATIONS ══════════════════════════════════ -->
+<div class="section" id="s6">
+  <h2><span class="section-num">6</span>Prompt Iterations During Development</h2>
+
+  <h3>Iteration 2 — Bug Fixes (v2.0 / v2.1)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">The game has several bugs. Please fix all of them:
+1. Pressing two arrow keys fast causes the snake to reverse into itself and die
+2. The power bar from the previous game persists onto the next game screen
+3. The fruit speed boost isn't working — eating fruit should give a 3-second speed burst
+4. Too many particles are spawning when the snake is long, causing the frame rate to drop
+5. Space key and R key should work to start/restart the game from any screen
+
+Also bump the version to v2.1.</div>
+  <p>The AI resolved all 5 issues by implementing a direction queue (prevents 180° reversal on rapid keypresses), adding cleanup in <code>initGame()</code>, implementing the fruit speed burst, capping particles at 250, and wiring up keyboard shortcuts.</p>
+
+  <h3>Iteration 3 — 10 New Features (v3.0)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">Research the top Snake games (Slither.io, Snake.io, Snake Rivals, Google Snake) and add the 10 best features they have that our game is missing.
+
+Make it feel more modern and competitive. Specifically I want:
+- More power-up variety (Shield, Magnet, Slow-Mo, Ghost)
+- A wrap/portal wall mode toggle
+- A better combo system (x2, x3, x5 multipliers)
+- Mobile support: D-pad buttons and touch swipe
+- Session statistics (items eaten, best combo)</div>
+  <p>This was the biggest single iteration — 10 features added in one pass, including 4 new power-ups, portal wall mode, an improved combo system, full mobile support with a D-pad, and a session stats bar.</p>
+
+  <h3>Iteration 4 — Gameplay Refinement (v3.1)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">The self-collision death rule feels too punishing and breaks the flow of the game.
+Remove self-collision — the snake should only die when it hits the outer wall boundary.
+Also repurpose the Ghost power-up to be a true wall-immunity pickup (wraps the snake through
+the wall instead of letting it pass through itself).</div>
+
+  <h3>Iteration 5 — Ambient Music (v3.2)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">Add ambient background music using the Web Audio API — no audio files, everything
+procedurally generated with oscillators. It should feel atmospheric and space-like.
+Low drones, slow modulation, occasional atmospheric blips.
+
+Also redesign the Game Over screen as a full animated modal with entrance animations,
+a glitch flicker on the title, and an animated score pop-in.</div>
+
+  <h3>Iteration 6 — Complete Redesign (v4.0)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">I want a complete visual and architectural rebuild of the game. New theme: Space Galaxy.
+
+Replace everything visually:
+- Animated starfield background (two layers: global + in-game canvas)
+- Nebula clouds in the corners with glowing colours
+- Food becomes glowing planets with orbital rings
+- Snake becomes a comet trail — glowing head, fading tail, colour gradient
+- Particle explosions on food collection and game over
+
+Restructure the game logic too:
+- Remove the old food type system — single planet food with score based on difficulty
+- 3 difficulty levels (Easy/Medium/Hard) with score multipliers
+- 4 power-ups: Speed Boost, Slow Motion, 2× Score, Wall Shield
+- Persistent leaderboard (top 10, saved to localStorage) shown on start + game over
+- 3-2-1-GO! countdown before each game
+- Mobile D-pad + touch swipe controls
+- Pause and mute buttons in HUD
+- Player name input on start screen
+
+This is for Panaversity AI-101 Assignment 3. Make it the best version yet.</div>
+  <p>The most significant iteration — a ground-up rebuild that produced the current SnakeAI Space Edition architecture.</p>
+
+  <h3>Iteration 7 — Visual Polish (v4.1)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">Visual polish pass:
+- Increase canvas scaling so it fills more of the screen
+- Make the starfield and nebulae inside the game canvas brighter and more vivid
+- Stronger glow on the snake head
+- Make the planet food larger and easier to see
+- HUD font should be bigger with a frosted glass background panel
+- Game over screen should be transparent so the starfield shows through</div>
+
+  <h3>Iteration 8 — Phase 1 Bug Fixes</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">Test the game and fix all remaining bugs:
+1. Wall Shield power-up timer bar never counts down — show "1 USE" label instead
+2. Self-collision was re-added in v4 rebuild but v3.1 had removed it — remove it again
+3. Retry button doesn't call scaleCanvas() — canvas stays wrong size if window was resized
+4. play.html GitHub link points to profile page not the actual repo</div>
+
+  <h3>Iteration 9 — Math Challenge Mode (Phase 2)</h3>
+  <div class="prompt-label">Prompt</div>
+  <div class="prompt-box">Add a Math Challenge Mode as an optional toggle on the start screen.
+
+When enabled:
+- A math question appears in a green bar between the HUD and the game canvas
+- The correct answer to the question is displayed as text on the food planet
+- When the snake eats the food, show a toast confirming the full equation
+  (e.g. "✓ 7 × 8 = 56")
+- Generate new question each time food spawns
+- Scale difficulty with game difficulty:
+    Easy = single-digit addition (e.g. 3 + 7 = ?)
+    Medium = single-digit multiplication (e.g. 6 × 9 = ?)
+    Hard = larger multiplication (e.g. 13 × 11 = ?)
+
+This turns the game into an educational tool — helping students drill math facts
+while playing. It satisfies the "real-world problem solved" bonus criterion.</div>
+</div>
+
+<!-- ══ 7. WHAT WORKED ══════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <h2><span class="section-num">7</span>What Worked Well</h2>
+  <ul>
+    <li><strong>Single-file architecture</strong> — keeping everything in one <code>index.html</code> made iteration fast. No build step, no config files, instant feedback in the browser.</li>
+    <li><strong>Canvas 2D rendering</strong> — the AI-generated drawing code was accurate and produced a visually polished result immediately, including gradient fills, radial glows, and shadow effects.</li>
+    <li><strong>Web Audio API procedural music</strong> — generating ambient space music without any audio files was surprisingly effective. The low-frequency drone with LFO modulation creates a genuine atmosphere.</li>
+    <li><strong>Iterative refinement</strong> — each prompt built on the last. Describing exactly what to change (not what to rebuild) allowed features to accumulate without losing prior work.</li>
+    <li><strong>AI understanding of game logic</strong> — complex systems like the direction queue (preventing 180° reversal), particle systems, and the power-up timer bar were implemented correctly on the first attempt.</li>
+    <li><strong>Responsive design</strong> — <code>scaleCanvas()</code> and CSS flexbox layout made the game work on all screen sizes without additional prompting.</li>
+    <li><strong>localStorage leaderboard</strong> — persistent scores across sessions were implemented cleanly with JSON serialization, XSS escaping, and top-10 capping.</li>
+  </ul>
+</div>
+
+<!-- ══ 8. WHAT DID NOT WORK ═══════════════════════════════════ -->
+<div class="section" id="s8">
+  <h2><span class="section-num">8</span>What Did Not Work</h2>
+  <div class="callout red">
+    These are areas where the AI-generated code required correction or where the initial approach failed.
+  </div>
+  <ul>
+    <li><strong>180° reversal bug</strong> — the first version allowed the snake to immediately reverse direction, killing itself. The AI's first fix (checking <code>dir</code> instead of the queued <code>ndir</code>) was incorrect and required a follow-up prompt to implement a proper direction queue.</li>
+    <li><strong>Power bar persistence</strong> — the power-up HUD bar was not being reset on game restart, meaning visual state leaked from one game session into the next.</li>
+    <li><strong>Self-collision regression</strong> — the v3.1 fix explicitly removed self-collision, but the v4.0 complete rebuild accidentally re-introduced it. Regressions like this happen when doing full rewrites rather than incremental changes.</li>
+    <li><strong>Automated screenshot testing</strong> — the Playwright snake automation script moved the snake into walls immediately, producing a score-0 game-over screenshot instead of a live gameplay shot. Required multiple attempts with slower timing and easy difficulty.</li>
+    <li><strong>Wall Shield timer UX</strong> — the original HUD timer bar for the SHIELD power-up stayed at 100% permanently (since shield is consumed on first use, not on a timer). This confused the intent and required an explicit fix to show "1 USE" instead.</li>
+  </ul>
+</div>
+
+<!-- ══ 9. BUGS / CHALLENGES ═══════════════════════════════════ -->
+<div class="section" id="s9">
+  <h2><span class="section-num">9</span>Bugs and Challenges Faced</h2>
+  <table>
+    <tr><th>#</th><th>Bug / Challenge</th><th>Version</th><th>Severity</th></tr>
+    <tr><td>1</td><td>Snake could reverse direction (180°) causing instant death on rapid keypresses</td><td>v1.0</td><td>Critical</td></tr>
+    <tr><td>2</td><td>Power bar and boost bar persisted visually after game restart</td><td>v1.0</td><td>High</td></tr>
+    <tr><td>3</td><td>Fruit speed boost was defined but never actually applied to move interval</td><td>v1.0</td><td>High</td></tr>
+    <tr><td>4</td><td>Particle system spawned unlimited particles — severe FPS drop at long snake lengths</td><td>v1.0</td><td>High</td></tr>
+    <tr><td>5</td><td>spawnFood() could infinite-loop if grid was completely full</td><td>v2.1</td><td>Medium</td></tr>
+    <tr><td>6</td><td>Self-collision re-introduced in v4 full rebuild (regression from v3.1 fix)</td><td>v4.0</td><td>Medium</td></tr>
+    <tr><td>7</td><td>Wall Shield timer bar displayed at 100% permanently — misleading UX</td><td>v4.0</td><td>Low</td></tr>
+    <tr><td>8</td><td>Retry button skipped <code>scaleCanvas()</code> — wrong canvas size after window resize</td><td>v4.0</td><td>Low</td></tr>
+    <tr><td>9</td><td>GitHub link in play.html pointed to profile page, not the specific repository</td><td>v4.0</td><td>Low</td></tr>
+    <tr><td>10</td><td>AudioContext creation blocked by browser autoplay policy until user gesture</td><td>v4.0</td><td>Low</td></tr>
+  </table>
+</div>
+
+<!-- ══ 10. HOW ISSUES WERE SOLVED ════════════════════════════ -->
+<div class="section" id="s10">
+  <h2><span class="section-num">10</span>How Issues Were Solved</h2>
+
+  <h3>Bug 1 — 180° Reversal</h3>
+  <p>Solved by replacing the single <code>dir</code> check with a <strong>direction queue</strong> (max 2 entries). New inputs are only accepted if they don't oppose the last queued direction, not the currently active direction. This prevents the race condition where two keys could be queued and applied in the same tick.</p>
+
+  <h3>Bug 2 — State Persistence Between Games</h3>
+  <p>Solved by adding explicit reset calls in <code>initGame()</code>: clearing the power bar display, resetting fill widths to 100%, and hiding HUD elements before each new game session begins.</p>
+
+  <h3>Bug 3 — Fruit Speed Boost</h3>
+  <p>Solved by making <code>getMs()</code> (the function that returns the move interval in milliseconds) read from both the active power-up state and the fruit boost flag simultaneously, combining their effects on the base interval.</p>
+
+  <h3>Bug 4 — Particle FPS Drop</h3>
+  <p>Solved by capping the global particle list at <strong>180 particles maximum</strong> and limiting power-mode sparkle emission to the head + 4 segments only. This kept particle counts bounded at any snake length.</p>
+
+  <h3>Bug 6 — Self-Collision Regression</h3>
+  <p>Solved by removing the <code>snake.some()</code> check in <code>tick()</code> that was re-introduced during the v4 rebuild. Only wall boundary collision now triggers game over, restoring the v3.1 design intent.</p>
+
+  <h3>Bug 7 — Shield HUD</h3>
+  <p>Solved by modifying <code>showPuHud()</code> to detect when SHIELD is the active power-up and replace the timer bar with a "1 USE" text label. The <code>hidePuHud()</code> function was updated to restore the timer bar on exit.</p>
+
+  <h3>Bug 10 — AudioContext Autoplay Policy</h3>
+  <p>Addressed by only calling <code>audio.init()</code> inside the Launch Mission button click handler — ensuring the AudioContext is created and resumed after a confirmed user interaction, as required by browser autoplay policies.</p>
+</div>
+
+<!-- ══ 11. FEATURES ═══════════════════════════════════════════ -->
+<div class="section" id="s11">
+  <h2><span class="section-num">11</span>Features Added or Improved</h2>
+
+  <h3>Core Game</h3>
+  <ul>
+    <li>Classic snake movement on a 30×22 cell grid (600×440 canvas)</li>
+    <li>3 difficulty levels: Easy (170ms/move, ×1), Medium (115ms, ×1.5), Hard (72ms, ×2)</li>
+    <li>3-2-1-GO! animated countdown before each game</li>
+    <li>Pause (P / Space / Esc) and mute (🔊) toggles in HUD</li>
+    <li>Player callsign input, persisted to leaderboard</li>
+  </ul>
+
+  <h3>Visual System</h3>
+  <ul>
+    <li>Two-layer animated starfield (220 background stars + 120 in-game stars)</li>
+    <li>4-corner nebula gradients in the game canvas</li>
+    <li>Planet food with radial gradient fill, specular highlight, and optional orbital ring</li>
+    <li>Snake rendered as a comet trail — RGB gradient from head to tail, rounded connectors, glowing eyes</li>
+    <li>Particle explosion system on food collection (18 particles) and game over (60 particles, dual colour)</li>
+    <li>Canvas auto-scales to viewport size on load, resize, and retry</li>
+  </ul>
+
+  <h3>Power-Up System</h3>
+  <ul>
+    <li><strong>⚡ Speed Boost</strong> — cuts move interval to 52% of base for 5 seconds</li>
+    <li><strong>❄ Slow Motion</strong> — stretches move interval to 185% for 6 seconds</li>
+    <li><strong>✦ 2× Score</strong> — doubles all points earned for 8 seconds</li>
+    <li><strong>◈ Wall Shield</strong> — absorbs one wall collision (snake wraps through instead of dying)</li>
+    <li>Power-ups spawn every 13–21 seconds and vanish after 9 seconds if uncollected</li>
+    <li>Orbital dot animation and shrinking timer arc on uncollected power-ups</li>
+    <li>HUD shows active power-up name, icon, and countdown bar (or "1 USE" for Shield)</li>
+  </ul>
+
+  <h3>Leaderboard</h3>
+  <ul>
+    <li>Top 10 scores stored in <code>localStorage</code> with name, difficulty, and date</li>
+    <li>Shown on both start screen and game over screen</li>
+    <li>"★ NEW HIGH SCORE ★" badge when topping the leaderboard</li>
+    <li>XSS-safe rendering using HTML entity escaping</li>
+  </ul>
+
+  <h3>Audio</h3>
+  <ul>
+    <li>Procedural ambient music: 3 low-frequency drones (55Hz, 82Hz, 110Hz) with LFO modulation + Am chord pad, fully synthesised via Web Audio oscillators</li>
+    <li>Sound effects: eat (frequency sweep), power-up (ascending arpeggio), expire (descending), game over (sawtooth descending scale)</li>
+  </ul>
+
+  <h3>Math Challenge Mode (Phase 2 Addition)</h3>
+  <ul>
+    <li>Optional toggle on start screen — does not affect normal gameplay when off</li>
+    <li>Green HUD bar shows current question (e.g. "SOLVE ▸ 7 × 8 = ?")</li>
+    <li>Correct answer displayed as white text on food planet surface</li>
+    <li>Toast confirms full equation on each food collection (e.g. "✓ 7 × 8 = 56")</li>
+    <li>Questions scale with difficulty: addition (Easy), multiplication (Medium/Hard)</li>
+  </ul>
+
+  <h3>Mobile Support</h3>
+  <ul>
+    <li>On-screen D-pad (auto-shown when screen width &lt; 700px or mobile user agent)</li>
+    <li>Touch swipe on game canvas (minimum 8px threshold)</li>
+    <li>Responsive canvas scaling with <code>clamp()</code> font sizes</li>
+  </ul>
+</div>
+
+<!-- ══ 12. FINAL RESULT ═══════════════════════════════════════ -->
+<div class="section" id="s12">
+  <h2><span class="section-num">12</span>Final Result</h2>
+  <div class="callout green">
+    The final game is a fully functional, polished browser Snake game deployed live on Vercel. It works on desktop and mobile, requires no installation, and loads instantly from a single HTML file.
+  </div>
+
+  <h3>Technical Specifications</h3>
+  <table>
+    <tr><th>Attribute</th><th>Value</th></tr>
+    <tr><td>File count</td><td>2 (index.html — game, play.html — landing page)</td></tr>
+    <tr><td>Total size</td><td>~46 KB (unminified HTML + inline CSS + JS)</td></tr>
+    <tr><td>Dependencies</td><td>Google Fonts CDN only (Orbitron, Share Tech Mono)</td></tr>
+    <tr><td>Browser support</td><td>All modern browsers (Chrome, Firefox, Edge, Safari)</td></tr>
+    <tr><td>Mobile support</td><td>Yes — D-pad + swipe controls</td></tr>
+    <tr><td>Works offline</td><td>Yes (after first load) — no server calls during gameplay</td></tr>
+    <tr><td>Audio</td><td>Procedural — Web Audio API, no audio files</td></tr>
+    <tr><td>Storage</td><td>localStorage (leaderboard only, ~1 KB)</td></tr>
+  </table>
+
+  <h3>Development Stats</h3>
+  <table>
+    <tr><th>Metric</th><th>Count</th></tr>
+    <tr><td>Git commits</td><td>11</td></tr>
+    <tr><td>Major versions</td><td>4 (v1 Cyberpunk → v2 Refined → v3 Feature-rich → v4 Space Edition)</td></tr>
+    <tr><td>Bugs fixed</td><td>10+</td></tr>
+    <tr><td>Prompt iterations</td><td>9</td></tr>
+    <tr><td>Lines of code</td><td>~1,000 (single file)</td></tr>
+    <tr><td>AI tool</td><td>Claude Sonnet 4.6 (Claude Code CLI)</td></tr>
+  </table>
+
+  <div class="link-row" style="margin-top:16px">
+    <a class="link-btn" href="https://neon-snake-gules.vercel.app/play.html" target="_blank">🎮 Play Live on Vercel</a>
+    <a class="link-btn ghost" href="https://github.com/ZeeshanKolachi/neon-snake" target="_blank">⌨ View on GitHub</a>
+  </div>
+</div>
+
+<!-- ══ 13. REAL-WORLD PROBLEM ═════════════════════════════════ -->
+<div class="section" id="s13">
+  <h2><span class="section-num">13</span>Real-World Problem Solved</h2>
+  <div class="callout">
+    <strong>Problem:</strong> Students often find math drills boring and struggle to stay engaged with repetitive arithmetic practice exercises.
+  </div>
+
+  <h3>Solution: Math Challenge Mode</h3>
+  <p>The Math Challenge Mode transforms the game into a <strong>gamified math drill tool</strong>. Rather than sitting through worksheets, students practice arithmetic facts naturally — each time the snake eats food, a new question is answered. The game loop (eat → score → grow → eat) creates a motivating feedback cycle.</p>
+
+  <h3>How it addresses the problem</h3>
+  <ul>
+    <li><strong>Engagement</strong> — Students are motivated to keep playing, which means more math facts practiced per session compared to worksheets</li>
+    <li><strong>Spaced repetition</strong> — New questions generate randomly on each food spawn, providing varied exposure across a session</li>
+    <li><strong>Difficulty scaling</strong> — Easy mode covers addition for younger students; Medium and Hard cover multiplication for more advanced learners</li>
+    <li><strong>Instant feedback</strong> — The toast message ("✓ 7 × 8 = 56") confirms the correct answer immediately after each collection, reinforcing the fact</li>
+    <li><strong>Zero friction</strong> — No login, no app install. Students open a browser link and start learning immediately</li>
+  </ul>
+
+  <h3>Target users</h3>
+  <ul>
+    <li>Primary school students (ages 7–12) practicing addition and multiplication tables</li>
+    <li>Teachers looking for a free, browser-based math game with no ads</li>
+    <li>Parents wanting a productive screen-time activity</li>
+  </ul>
+
+  <div class="callout green">
+    The game is free, open source, works on any device with a browser, and requires no account or installation — making it immediately accessible for classroom or home use.
+  </div>
+</div>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+<hr style="border:none;border-top:1px solid var(--border);margin:40px 0 20px">
+<p style="text-align:center;color:var(--muted);font-size:12px">
+  Panaversity AI-101 · Assignment 3 · Zeeshan Ahmed · June 2026<br>
+  Built with <strong>Claude Sonnet 4.6</strong> (Claude Code CLI) · Deployed on Vercel · Source on GitHub
+</p>
+
+</body>
+</html>

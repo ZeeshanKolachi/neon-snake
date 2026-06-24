@@ -181,6 +181,25 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 }
 .menu-btn:hover{background:rgba(0,80,200,.15)}
 
+/* ── MATH MODE ── */
+.math-toggle{
+  width:100%;padding:9px;border-radius:5px;border:1px solid #00ff8844;
+  background:transparent;color:#00ff8866;font-family:'Orbitron',sans-serif;
+  font-size:.62rem;font-weight:700;letter-spacing:.15em;cursor:pointer;transition:all .25s;
+}
+.math-toggle.on{background:rgba(0,255,136,.12);color:#00ff88;border-color:#00ff88;box-shadow:0 0 12px #00ff8844}
+.math-toggle:hover{background:rgba(0,255,136,.07);color:#00ff88aa}
+
+#mathBar{
+  width:100%;text-align:center;padding:7px 14px;
+  background:rgba(0,30,10,.75);border:1px solid #00ff8844;border-radius:6px;
+  font-family:'Share Tech Mono',monospace;color:#00ff88;
+  letter-spacing:.06em;text-shadow:0 0 8px #00ff8855;
+  display:none;
+}
+#mathQ-label{font-size:.55rem;letter-spacing:.35em;color:#00aa55;margin-right:10px}
+#mathQuestion{font-size:1.05rem;font-weight:bold}
+
 /* Toast */
 #toast{
   position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
@@ -215,6 +234,10 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
         <button class="diff-btn hard"   data-d="hard">HARD</button>
       </div>
     </div>
+    <div style="width:100%">
+      <div class="field-label" style="margin-bottom:8px">▸ MATH CHALLENGE MODE</div>
+      <button class="math-toggle" id="mathToggle">📐 ENABLE MATH CHALLENGES</button>
+    </div>
     <button class="launch-btn" id="launchBtn">▶ LAUNCH MISSION</button>
     <div class="lb-box">
       <div class="lb-title">▸ HALL OF FAME ◂</div>
@@ -236,6 +259,7 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
           <span id="puIcon"></span>
           <span id="puName"></span>
           <div id="puTimerWrap"><div id="puTimerFill"></div></div>
+          <span id="puUse" style="display:none;font-size:.6rem;opacity:.7">1 USE</span>
         </div>
       </div>
       <div class="hud-block">
@@ -244,6 +268,9 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
       </div>
       <button class="icon-btn" id="muteBtn" title="Sound">🔊</button>
       <button class="icon-btn" id="pauseBtn" title="Pause (P)">⏸</button>
+    </div>
+    <div id="mathBar">
+      <span id="mathQ-label">SOLVE ▸</span><span id="mathQuestion"></span>
     </div>
     <div id="canvasWrap">
       <canvas id="gameCanvas"></canvas>
@@ -509,11 +536,26 @@ function renderLb(el,lb){
 }
 
 // ══════════════════════════════════════════
+// MATH MODE
+// ══════════════════════════════════════════
+const MATH_GEN={
+  easy:  ()=>{const a=~~(Math.random()*9)+1,b=~~(Math.random()*9)+1; return{q:`${a} + ${b} = ?`,ans:a+b}},
+  medium:()=>{const a=~~(Math.random()*9)+2,b=~~(Math.random()*9)+2; return{q:`${a} × ${b} = ?`,ans:a*b}},
+  hard:  ()=>{const a=~~(Math.random()*12)+4,b=~~(Math.random()*12)+4;return{q:`${a} × ${b} = ?`,ans:a*b}}
+};
+function genQuestion(){
+  currentQ=MATH_GEN[diff]();
+  const el=document.getElementById('mathQuestion');
+  if(el) el.textContent=currentQ.q;
+}
+
+// ══════════════════════════════════════════
 // GAME STATE
 // ══════════════════════════════════════════
 let state='start', diff='medium', pilotName='PILOT';
 let snake, dir, dirQ, food, powerUpObj;
 let score, best;
+let mathMode=false, currentQ=null;
 let activePU=null, puTimer=0, puDur=0, shieldOn=false, multiplier=1;
 let puSpawnIn=0;
 let moveTimer=0;
@@ -544,6 +586,7 @@ function spawnFood(){
   do{p={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)}}
   while(snake.some(s=>s.x===p.x&&s.y===p.y)||(powerUpObj&&powerUpObj.x===p.x&&powerUpObj.y===p.y));
   const pal=PLANET_PAL[Math.floor(Math.random()*PLANET_PAL.length)];
+  if(mathMode) genQuestion();
   return{...p,col:pal[0],hi:pal[1],ring:Math.random()>.45};
 }
 
@@ -579,9 +622,6 @@ function tick(){
       toast('◈ SHIELD ABSORBED WALL!');
     } else { gameOver(); return; }
   }
-  // Self collision
-  if(snake.some(s=>s.x===nx&&s.y===ny)){ gameOver(); return; }
-
   snake.unshift({x:nx,y:ny});
 
   if(nx===food.x&&ny===food.y){
@@ -589,6 +629,7 @@ function tick(){
     score+=pts; best=Math.max(best,score);
     audio.eat();
     particles.burst(nx*CELL+CELL/2,ny*CELL+CELL/2,food.col,18);
+    if(mathMode&&currentQ) toast(`✓ ${currentQ.q.replace('= ?','=')} ${currentQ.ans}`);
     food=spawnFood();
   } else { snake.pop(); }
 
@@ -732,6 +773,14 @@ function drawFood(t){
   const hl=cx.createRadialGradient(scx-r*.4,scy-r*.4,0,scx-r*.2,scy-r*.2,r*.55);
   hl.addColorStop(0,'rgba(255,255,255,.55)'); hl.addColorStop(1,'transparent');
   cx.fillStyle=hl; cx.beginPath(); cx.arc(scx,scy,r,0,Math.PI*2); cx.fill();
+  if(mathMode&&currentQ){
+    const ans=String(currentQ.ans);
+    const fs=Math.round(r*(ans.length>2?.52:ans.length>1?.72:.92));
+    cx.shadowBlur=0; cx.fillStyle='#fff';
+    cx.font=`bold ${fs}px 'Share Tech Mono',monospace`;
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText(ans,scx,scy+1);
+  }
   cx.restore();
 }
 
@@ -818,14 +867,21 @@ function updateHud(){
 }
 function showPuHud(type){
   const info=PU[type];
+  const isShield=type==='SHIELD';
   const el=document.getElementById('puIndicator');
   el.style.display='flex'; el.style.color=info.color; el.style.borderColor=info.color;
   document.getElementById('puIcon').textContent=info.icon;
   document.getElementById('puName').textContent=info.label;
   document.getElementById('puTimerFill').style.background=info.color;
   document.getElementById('puTimerFill').style.width='100%';
+  document.getElementById('puTimerWrap').style.display=isShield?'none':'block';
+  document.getElementById('puUse').style.display=isShield?'inline':'none';
 }
-function hidePuHud(){document.getElementById('puIndicator').style.display='none'}
+function hidePuHud(){
+  document.getElementById('puIndicator').style.display='none';
+  document.getElementById('puTimerWrap').style.display='block';
+  document.getElementById('puUse').style.display='none';
+}
 
 // ══════════════════════════════════════════
 // TOAST
@@ -932,15 +988,29 @@ function launch(){
   initGame();
   showScreen('gameScreen');
   scaleCanvas();
+  document.getElementById('mathBar').style.display=mathMode?'block':'none';
+  if(mathMode) genQuestion();
   // Show D-pad on mobile or small screen
   const mob=/Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent)||innerWidth<700;
   if(mob)document.getElementById('dpad').classList.add('show');
   startCountdown(()=>{state='playing';lastTs=performance.now()});
 }
 
+document.getElementById('mathToggle').addEventListener('click',()=>{
+  mathMode=!mathMode;
+  const btn=document.getElementById('mathToggle');
+  btn.classList.toggle('on',mathMode);
+  btn.textContent=mathMode?'✓ MATH CHALLENGES ENABLED':'📐 ENABLE MATH CHALLENGES';
+});
+
 document.getElementById('pauseBtn').addEventListener('click',togglePause);
 document.getElementById('pauseOverlay').addEventListener('click',togglePause);
-document.getElementById('pauseMenuBtn').addEventListener('click',()=>{state='start';showScreen('startScreen');renderLb(document.getElementById('startLb'),getLb())});
+document.getElementById('pauseMenuBtn').addEventListener('click',()=>{
+  state='start';
+  document.getElementById('mathBar').style.display='none';
+  showScreen('startScreen');
+  renderLb(document.getElementById('startLb'),getLb());
+});
 document.getElementById('muteBtn').addEventListener('click',()=>{
   const m=audio.toggleMute();
   document.getElementById('muteBtn').textContent=m?'🔇':'🔊';
@@ -950,10 +1020,16 @@ document.getElementById('retryBtn').addEventListener('click',()=>{
   audio.init();
   initGame();
   showScreen('gameScreen');
+  scaleCanvas();
+  document.getElementById('mathBar').style.display=mathMode?'block':'none';
+  if(mathMode) genQuestion();
   startCountdown(()=>{state='playing';lastTs=performance.now()});
 });
 document.getElementById('menuBtn').addEventListener('click',()=>{
-  state='start';showScreen('startScreen');renderLb(document.getElementById('startLb'),getLb());
+  state='start';
+  document.getElementById('mathBar').style.display='none';
+  showScreen('startScreen');
+  renderLb(document.getElementById('startLb'),getLb());
 });
 
 // ══════════════════════════════════════════

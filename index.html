@@ -181,6 +181,61 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 }
 .menu-btn:hover{background:rgba(0,80,200,.15)}
 
+/* ── HOW TO PLAY MODAL ── */
+#htpOverlay{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,18,.88);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+}
+#htpOverlay.show{display:flex}
+.htp-card{
+  max-width:480px;width:94%;max-height:88vh;overflow-y:auto;
+  background:rgba(4,4,28,.97);border:1px solid #0055bb55;border-radius:12px;
+  padding:26px 24px 22px;
+  box-shadow:0 0 80px #0022aa33,inset 0 0 40px rgba(0,0,20,.6);
+}
+.htp-title{
+  font-size:1rem;font-weight:900;letter-spacing:.25em;
+  color:#00ffff;text-shadow:0 0 16px #00ffff88;
+  text-align:center;margin-bottom:18px;
+}
+.htp-section{margin-bottom:16px}
+.htp-label{
+  font-size:.55rem;letter-spacing:.35em;color:#0077cc;
+  margin-bottom:7px;text-transform:uppercase;
+}
+.htp-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:5px 0;border-bottom:1px solid #0044aa18;
+  font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#aabbdd;
+}
+.htp-row:last-child{border:none}
+.htp-key{
+  min-width:90px;color:#00ffff;font-weight:bold;flex-shrink:0;
+}
+.htp-pu{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.htp-pu-item{
+  background:rgba(0,0,20,.6);border:1px solid #0044aa22;border-radius:5px;
+  padding:6px 9px;font-family:'Share Tech Mono',monospace;font-size:.68rem;
+}
+.htp-pu-icon{font-size:.95rem;margin-right:5px}
+.htp-pu-name{color:#fff;font-size:.65rem;display:block;margin-bottom:2px}
+.htp-pu-desc{color:#556688;font-size:.6rem}
+.htp-close{
+  width:100%;margin-top:18px;padding:11px;border-radius:6px;
+  border:1px solid #00ffff55;background:rgba(0,255,255,.1);
+  color:#00ffff;font-family:'Orbitron',sans-serif;font-size:.75rem;
+  font-weight:700;letter-spacing:.2em;cursor:pointer;transition:all .25s;
+}
+.htp-close:hover{background:rgba(0,255,255,.2);box-shadow:0 0 16px #00ffff33}
+
+.htp-btn{
+  width:100%;padding:8px;border-radius:5px;border:1px solid #0055bb44;
+  background:transparent;color:#0077cc;font-family:'Orbitron',sans-serif;
+  font-size:.6rem;font-weight:700;letter-spacing:.12em;cursor:pointer;transition:all .25s;
+}
+.htp-btn:hover{background:rgba(0,80,200,.15);color:#00ccff}
+
 /* ── MATH MODE ── */
 .math-toggle{
   width:100%;padding:9px;border-radius:5px;border:1px solid #00ff8844;
@@ -239,6 +294,7 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
       <button class="math-toggle" id="mathToggle">📐 ENABLE MATH CHALLENGES</button>
     </div>
     <button class="launch-btn" id="launchBtn">▶ LAUNCH MISSION</button>
+    <button class="htp-btn" id="htpBtn">❓ HOW TO PLAY</button>
     <div class="lb-box">
       <div class="lb-title">▸ HALL OF FAME ◂</div>
       <ul class="lb-list" id="startLb"><li class="lb-empty">No scores yet — be the first!</li></ul>
@@ -268,6 +324,7 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
       </div>
       <button class="icon-btn" id="muteBtn" title="Sound">🔊</button>
       <button class="icon-btn" id="pauseBtn" title="Pause (P)">⏸</button>
+      <button class="icon-btn" id="htpGameBtn" title="How to Play">❓</button>
     </div>
     <div id="mathBar">
       <span id="mathQ-label">SOLVE ▸</span><span id="mathQuestion"></span>
@@ -312,6 +369,59 @@ canvas#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;poi
 </div>
 
 <div id="toast"></div>
+
+<!-- ══ HOW TO PLAY MODAL ══ -->
+<div id="htpOverlay">
+  <div class="htp-card">
+    <div class="htp-title">❓ HOW TO PLAY</div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ OBJECTIVE</div>
+      <div class="htp-row"><span class="htp-key" style="min-width:unset;color:#aabbdd">Guide your snake through space to collect glowing planets. Each planet you eat makes the snake grow longer. Avoid hitting the walls — the game ends on impact. The longer you survive and the more you eat, the higher your score.</span></div>
+    </div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ CONTROLS</div>
+      <div class="htp-row"><span class="htp-key">↑ ↓ ← →</span><span>Arrow keys — move the snake</span></div>
+      <div class="htp-row"><span class="htp-key">W A S D</span><span>Alternative movement keys</span></div>
+      <div class="htp-row"><span class="htp-key">P / Space</span><span>Pause or resume the game</span></div>
+      <div class="htp-row"><span class="htp-key">Esc</span><span>Pause the game</span></div>
+      <div class="htp-row"><span class="htp-key">🔊 Button</span><span>Toggle music and sound effects</span></div>
+      <div class="htp-row"><span class="htp-key">Swipe</span><span>Swipe on screen (mobile)</span></div>
+      <div class="htp-row"><span class="htp-key">D-Pad</span><span>On-screen buttons (mobile / small screen)</span></div>
+    </div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ SCORING</div>
+      <div class="htp-row"><span class="htp-key">EASY</span><span>10 pts per planet · ×1 multiplier</span></div>
+      <div class="htp-row"><span class="htp-key">MEDIUM</span><span>15 pts per planet · ×1.5 multiplier</span></div>
+      <div class="htp-row"><span class="htp-key">HARD</span><span>20 pts per planet · ×2 multiplier</span></div>
+      <div class="htp-row"><span class="htp-key">2× SCORE</span><span>Power-up doubles all points for 8 seconds</span></div>
+    </div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ POWER-UPS (appear every 13–21 sec, vanish after 9 sec)</div>
+      <div class="htp-pu">
+        <div class="htp-pu-item"><span class="htp-pu-icon">⚡</span><span class="htp-pu-name">SPEED BOOST</span><span class="htp-pu-desc">Snake moves much faster for 5 sec</span></div>
+        <div class="htp-pu-item"><span class="htp-pu-icon">❄</span><span class="htp-pu-name">SLOW MOTION</span><span class="htp-pu-desc">Slows snake for 6 sec — more time to react</span></div>
+        <div class="htp-pu-item"><span class="htp-pu-icon">✦</span><span class="htp-pu-name">2× SCORE</span><span class="htp-pu-desc">Doubles all points earned for 8 sec</span></div>
+        <div class="htp-pu-item"><span class="htp-pu-icon">◈</span><span class="htp-pu-name">WALL SHIELD</span><span class="htp-pu-desc">One-time wall pass — snake wraps through</span></div>
+      </div>
+    </div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ MATH CHALLENGE MODE (optional)</div>
+      <div class="htp-row"><span class="htp-key" style="min-width:unset;color:#aabbdd">Enable the toggle on the start screen. A math question appears above the game. The answer is printed on the planet — eat it to confirm the equation. Questions scale with difficulty: addition on Easy, multiplication on Medium and Hard.</span></div>
+    </div>
+
+    <div class="htp-section">
+      <div class="htp-label">▸ TIPS</div>
+      <div class="htp-row"><span class="htp-key" style="min-width:unset;color:#aabbdd">• You cannot reverse direction into yourself<br>• Plan your path — longer snake needs more space<br>• Collect the Wall Shield before attempting risky moves<br>• Hard mode gives 2× score — ideal for chasing high scores<br>• Your top 10 scores are saved automatically</span></div>
+    </div>
+
+    <button class="htp-close" id="htpClose">✕ CLOSE</button>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════════════════
@@ -995,6 +1105,18 @@ function launch(){
   if(mob)document.getElementById('dpad').classList.add('show');
   startCountdown(()=>{state='playing';lastTs=performance.now()});
 }
+
+// ── HOW TO PLAY MODAL ──
+function openHtp(){ document.getElementById('htpOverlay').classList.add('show'); }
+function closeHtp(){ document.getElementById('htpOverlay').classList.remove('show'); }
+document.getElementById('htpBtn').addEventListener('click', openHtp);
+document.getElementById('htpGameBtn').addEventListener('click',()=>{
+  if(state==='playing') togglePause();
+  openHtp();
+});
+document.getElementById('htpClose').addEventListener('click', closeHtp);
+document.getElementById('htpOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('htpOverlay')) closeHtp(); });
+document.addEventListener('keydown',e=>{ if(e.key==='?' || (e.key==='Escape'&&document.getElementById('htpOverlay').classList.contains('show'))) closeHtp(); });
 
 document.getElementById('mathToggle').addEventListener('click',()=>{
   mathMode=!mathMode;

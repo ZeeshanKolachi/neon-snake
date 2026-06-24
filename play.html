@@ -133,10 +133,22 @@ body::after{
   background:#000;
 }
 
-/* ── CONTROLS GRID ── */
-.info-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;
+/* ── HOW TO PLAY + INFO GRID ── */
+.guide-section{
   width:100%;max-width:1100px;padding:0 16px 16px;
+}
+.guide-heading{
+  font-size:.6rem;letter-spacing:.5em;color:#0077cc;
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+}
+.guide-heading::before,.guide-heading::after{
+  content:'';display:block;flex:1;height:1px;background:linear-gradient(to right,transparent,#0044aa88);
+}
+.guide-heading::after{transform:scaleX(-1)}
+
+.info-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;
+  margin-bottom:16px;
 }
 .info-card{
   border:1px solid #0044aa33;border-radius:10px;padding:20px;
@@ -144,24 +156,48 @@ body::after{
   transition:border-color .3s,box-shadow .3s;
 }
 .info-card:hover{border-color:#0077cc88;box-shadow:0 0 20px #0033aa22}
+.info-card.full{grid-column:1/-1}
 .card-icon{font-size:1.8rem;margin-bottom:10px}
-.card-title{font-size:.7rem;letter-spacing:.3em;color:#0099ff;margin-bottom:8px}
+.card-title{font-size:.7rem;letter-spacing:.3em;color:#0099ff;margin-bottom:12px}
 .card-body{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:#6688aa;line-height:1.8}
 .card-body span{color:#00ccff}
+
+/* controls table */
+.ctrl-table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:.72rem}
+.ctrl-table tr{border-bottom:1px solid #0044aa18}
+.ctrl-table tr:last-child{border:none}
+.ctrl-table td{padding:5px 0;color:#6688aa;vertical-align:top}
+.ctrl-table td:first-child{color:#00ccff;min-width:120px;font-weight:bold}
+
+/* scoring table */
+.score-table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:.72rem}
+.score-table tr{border-bottom:1px solid #0044aa18}
+.score-table tr:last-child{border:none}
+.score-table td{padding:5px 4px;color:#6688aa;vertical-align:top}
+.score-table td:first-child{color:#00ccff;min-width:80px;font-weight:bold}
+.score-table td:last-child{color:#aabbdd}
+
+/* tips list */
+.tip-list{list-style:none;padding:0;margin:0;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#6688aa}
+.tip-list li{padding:5px 0;border-bottom:1px solid #0044aa18;padding-left:18px;position:relative;line-height:1.5}
+.tip-list li:last-child{border:none}
+.tip-list li::before{content:'▸';position:absolute;left:0;color:#0066aa}
+.tip-list li span{color:#00ccff}
 
 /* ── POWER-UPS TABLE ── */
 .pu-grid{
   display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:0;
 }
 .pu-item{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(0,0,20,.5);border-radius:6px;padding:8px 10px;
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(0,0,20,.5);border-radius:6px;padding:10px;
   border:1px solid rgba(255,255,255,.05);
 }
-.pu-icon{font-size:1.2rem;width:28px;text-align:center}
-.pu-info{display:flex;flex-direction:column;gap:2px}
+.pu-icon{font-size:1.4rem;width:28px;text-align:center;flex-shrink:0;margin-top:2px}
+.pu-info{display:flex;flex-direction:column;gap:3px}
 .pu-name{font-size:.62rem;letter-spacing:.1em;color:#fff;font-family:'Share Tech Mono',monospace}
-.pu-desc{font-size:.55rem;color:#556677;font-family:'Share Tech Mono',monospace}
+.pu-desc{font-size:.6rem;color:#556677;font-family:'Share Tech Mono',monospace;line-height:1.4}
+.pu-dur{font-size:.55rem;color:#0077aa;font-family:'Share Tech Mono',monospace}
 
 /* ── FOOTER ── */
 .footer{
@@ -198,7 +234,7 @@ body::after{
     <p class="hero-desc">
       A fully AI-built Snake game featuring space exploration mechanics,
       ambient music, 4 power-ups, 3 difficulty levels, and a global
-      leaderboard. Built for Panaversity AI-101 Assignment 3.
+      leaderboard. Built for Panaversity AI-101 Assignment 2.
     </p>
 
     <div class="stats">
@@ -230,81 +266,143 @@ body::after{
   </section>
 
   <!-- INFO CARDS -->
-  <div class="info-grid">
+  <div class="guide-section">
+    <div class="guide-heading">HOW TO PLAY</div>
 
-    <div class="info-card">
-      <div class="card-icon">🎮</div>
-      <div class="card-title">CONTROLS</div>
-      <div class="card-body">
-        <span>Arrow Keys</span> or <span>WASD</span> — move<br>
-        <span>P</span> / <span>Space</span> / <span>Esc</span> — pause<br>
-        <span>🔊</span> — toggle music & SFX<br>
-        <span>Swipe</span> — on mobile devices<br>
-        <span>D-Pad</span> — on-screen for touch
-      </div>
-    </div>
+    <div class="info-grid">
 
-    <div class="info-card">
-      <div class="card-icon">⚡</div>
-      <div class="card-title">POWER-UPS</div>
-      <div class="pu-grid">
-        <div class="pu-item">
-          <div class="pu-icon">⚡</div>
-          <div class="pu-info">
-            <div class="pu-name">SPEED BOOST</div>
-            <div class="pu-desc">Snake moves faster</div>
-          </div>
-        </div>
-        <div class="pu-item">
-          <div class="pu-icon">❄</div>
-          <div class="pu-info">
-            <div class="pu-name">SLOW MOTION</div>
-            <div class="pu-desc">More reaction time</div>
-          </div>
-        </div>
-        <div class="pu-item">
-          <div class="pu-icon">✦</div>
-          <div class="pu-info">
-            <div class="pu-name">2× SCORE</div>
-            <div class="pu-desc">Double points</div>
-          </div>
-        </div>
-        <div class="pu-item">
-          <div class="pu-icon">◈</div>
-          <div class="pu-info">
-            <div class="pu-name">WALL SHIELD</div>
-            <div class="pu-desc">Pass through once</div>
-          </div>
+      <!-- OBJECTIVE -->
+      <div class="info-card full">
+        <div class="card-icon">🚀</div>
+        <div class="card-title">OBJECTIVE</div>
+        <div class="card-body">
+          Guide your snake through space to collect the glowing <span>planet food</span> that appears on the canvas.
+          Every planet you eat makes your snake grow longer and adds to your score.
+          The game ends when your snake <span>hits a wall</span> — so plan your path carefully as the snake grows.
+          Survive as long as possible, collect power-ups, and climb the <span>Hall of Fame</span> leaderboard!
         </div>
       </div>
-    </div>
 
-    <div class="info-card">
-      <div class="card-icon">🚀</div>
-      <div class="card-title">DIFFICULTY</div>
-      <div class="card-body">
-        <span>EASY</span> — slower speed, 1× score<br>
-        <span>MEDIUM</span> — standard, 1.5× score<br>
-        <span>HARD</span> — fast speed, 2× score<br><br>
-        Higher difficulty = bigger scores.
-        Power-ups appear every 13–21 seconds
-        and vanish if uncollected for 9 seconds.
+      <!-- CONTROLS -->
+      <div class="info-card">
+        <div class="card-icon">🎮</div>
+        <div class="card-title">CONTROLS</div>
+        <table class="ctrl-table">
+          <tr><td>↑ ↓ ← →</td><td>Move the snake</td></tr>
+          <tr><td>W A S D</td><td>Alternative movement</td></tr>
+          <tr><td>P / Space</td><td>Pause / Resume</td></tr>
+          <tr><td>Esc</td><td>Pause the game</td></tr>
+          <tr><td>🔊 Button</td><td>Toggle music & SFX</td></tr>
+          <tr><td>❓ Button</td><td>Show instructions</td></tr>
+          <tr><td>Swipe</td><td>Move on mobile</td></tr>
+          <tr><td>D-Pad</td><td>On-screen buttons (mobile)</td></tr>
+        </table>
       </div>
-    </div>
 
-    <div class="info-card">
-      <div class="card-icon">🌌</div>
-      <div class="card-title">BUILT WITH AI</div>
-      <div class="card-body">
-        <span>Claude Sonnet 4.6</span> — game engine<br>
-        <span>Web Audio API</span> — procedural music<br>
-        <span>Canvas 2D</span> — rendering<br>
-        <span>localStorage</span> — leaderboard<br><br>
-        Zero external dependencies. Single
-        HTML file. Works offline.
+      <!-- SCORING & DIFFICULTY -->
+      <div class="info-card">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">SCORING & DIFFICULTY</div>
+        <table class="score-table">
+          <tr><td>EASY</td><td>170ms/move</td><td>×1.0 score</td></tr>
+          <tr><td>MEDIUM</td><td>115ms/move</td><td>×1.5 score</td></tr>
+          <tr><td>HARD</td><td>72ms/move</td><td>×2.0 score</td></tr>
+        </table>
+        <div class="card-body" style="margin-top:12px">
+          Base score is <span>10 pts</span> per planet, multiplied by difficulty.
+          The <span>2× Score</span> power-up doubles all points for 8 seconds.
+          Your top 10 scores are saved automatically via <span>localStorage</span>.
+        </div>
       </div>
-    </div>
 
+      <!-- POWER-UPS -->
+      <div class="info-card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">POWER-UPS</div>
+        <div class="card-body" style="margin-bottom:10px">Appear every <span>13–21 seconds</span>. Vanish after <span>9 seconds</span> if not collected.</div>
+        <div class="pu-grid">
+          <div class="pu-item">
+            <div class="pu-icon">⚡</div>
+            <div class="pu-info">
+              <div class="pu-name">SPEED BOOST</div>
+              <div class="pu-desc">Snake moves much faster</div>
+              <div class="pu-dur">Duration: 5 sec</div>
+            </div>
+          </div>
+          <div class="pu-item">
+            <div class="pu-icon">❄</div>
+            <div class="pu-info">
+              <div class="pu-name">SLOW MOTION</div>
+              <div class="pu-desc">Slows snake — more reaction time</div>
+              <div class="pu-dur">Duration: 6 sec</div>
+            </div>
+          </div>
+          <div class="pu-item">
+            <div class="pu-icon">✦</div>
+            <div class="pu-info">
+              <div class="pu-name">2× SCORE</div>
+              <div class="pu-desc">Doubles all points earned</div>
+              <div class="pu-dur">Duration: 8 sec</div>
+            </div>
+          </div>
+          <div class="pu-item">
+            <div class="pu-icon">◈</div>
+            <div class="pu-info">
+              <div class="pu-name">WALL SHIELD</div>
+              <div class="pu-desc">Snake wraps through wall once</div>
+              <div class="pu-dur">1 USE only</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div class="info-card">
+        <div class="card-icon">💡</div>
+        <div class="card-title">PRO TIPS</div>
+        <ul class="tip-list">
+          <li>You <span>cannot reverse</span> direction — plan moves in advance</li>
+          <li>The longer the snake, the <span>less open space</span> you have</li>
+          <li>Grab <span>Wall Shield</span> before making risky corner moves</li>
+          <li>Stack <span>2× Score</span> with Hard difficulty for maximum points</li>
+          <li><span>Slow Motion</span> is great when the snake gets dangerously long</li>
+          <li>Power-ups disappear after 9 sec — <span>prioritise them</span></li>
+          <li>Your <span>top 10 scores</span> are saved across sessions</li>
+        </ul>
+      </div>
+
+      <!-- MATH MODE -->
+      <div class="info-card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">MATH CHALLENGE MODE</div>
+        <div class="card-body">
+          Enable the <span>📐 ENABLE MATH CHALLENGES</span> toggle before launching.
+          <br><br>
+          A <span>math question</span> appears in a green bar above the game canvas.
+          The <span>correct answer</span> is shown as text on the planet food.
+          Eat the planet to confirm the answer — a toast shows the full equation.<br><br>
+          <span>Easy</span> → single-digit addition (e.g. 3 + 7 = ?)<br>
+          <span>Medium</span> → multiplication (e.g. 6 × 9 = ?)<br>
+          <span>Hard</span> → larger multiplication (e.g. 13 × 11 = ?)
+        </div>
+      </div>
+
+      <!-- BUILT WITH AI -->
+      <div class="info-card">
+        <div class="card-icon">🌌</div>
+        <div class="card-title">BUILT WITH AI</div>
+        <div class="card-body">
+          <span>Claude Sonnet 4.6</span> — all code generation<br>
+          <span>Web Audio API</span> — procedural ambient music<br>
+          <span>Canvas 2D</span> — all rendering & animation<br>
+          <span>localStorage</span> — persistent leaderboard<br><br>
+          Zero external dependencies. Single HTML file.
+          Works completely offline after first load.
+          Built for <span>Panaversity AI-101 Assignment 2</span>.
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- FOOTER -->
